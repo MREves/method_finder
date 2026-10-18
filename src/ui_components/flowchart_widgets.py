@@ -2,11 +2,12 @@
 
 Provides comprehensive visual decision trees, multi-pillar triage diagrams,
 interactive path simulators, and educational triage rules across:
-1. Master Cross-Pillar Triage (Statistics vs Epidemiology vs Machine Learning)
+1. Master Cross-Pillar Triage (Statistics vs Epidemiology vs Machine Learning vs Sample Size vs NLP)
 2. Classical Statistical Hypothesis Testing (18 Tests, Parametric & Non-Parametric)
 3. Observational Epidemiology & Public Health (17 Methods, Risk, Rates & Screening)
 4. Machine Learning & Predictive Modeling (16 Architectures, Rare Events & Clustering)
 5. Biostatistical Sample Size & Power Planning (10 Frameworks, Attrition & Clusters)
+6. Qualitative Analysis & Natural Language Processing (7 Methods, Rule-Based to LLMs)
 """
 
 import html
@@ -34,15 +35,16 @@ def render_html(html_str: str) -> None:
 def render_master_triage_flowchart() -> None:
     """Renders the high-level triage flowchart mapping real-world research questions
 
-    to the appropriate quantitative analytical pillar.
+    to the appropriate quantitative and qualitative analytical pillar.
     """
     st.markdown("### 🌐 Master Cross-Pillar Triage: Choosing Your Analytical Pillar")
     st.markdown("""
-    When designing a quantitative analysis, the most fundamental decision is determining **which analytical paradigm** fits your research question, data collection process, and governance requirements:
+    When designing an investigation, the most fundamental decision is determining **which analytical paradigm** fits your research question, data collection process, and governance requirements:
     * **Pillar 1: Classical Statistics** — Hypothesis testing, $p$-values, effect sizes, and confidence intervals under controlled or randomized conditions.
     * **Pillar 2: Observational Epidemiology** — Quantifying disease risk, incidence rates, diagnostic accuracy, and controlling confounding without experimental randomization.
     * **Pillar 3: Machine Learning & AI** — Predictive scoring, handling high-dimensional complex patterns, rare event detection, and unsupervised phenotypic discovery.
     * **Pillar 4: Biostatistical Sample Size & Power** — Formal trial planning, minimal detectable differences, and ethical sample sizing.
+    * **Pillar 5: Qualitative Analysis & NLP** — Extracting structured insights, sentiment, negation, topics, clinical entities, and factual synthesis from unstructured text narratives.
     """)
 
     # Visual Mermaid Diagram
@@ -60,6 +62,8 @@ flowchart TD
 
     Q1 -->|"Prospective Study Sizing & Protocol Design"| P4["📐 Pillar 4: Sample Size & Power<br/>(Closed-Form Formulas, MCID, Attrition Cushion, VIF)"]
 
+    Q1 -->|"Unstructured Text & Qualitative Language Insights"| P5["🗣️ Pillar 5: Qualitative Analysis & NLP<br/>(Sentiment, NegEx, TF-IDF, Topics, Embeddings, LLM RAG)"]
+
     P1 -.->|"Requires Power Sizing"| P4
     P2 -.->|"Requires Power Sizing"| P4
     ML_Unsup -.->|"Requires Sample Sizing"| P4
@@ -68,18 +72,20 @@ flowchart TD
     classDef epi fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af;
     classDef ml fill:#faf5ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
     classDef power fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#9a3412;
+    classDef nlp fill:#f0f9ff,stroke:#0284c7,stroke-width:2px,color:#0369a1;
     classDef decision fill:#f8fafc,stroke:#64748b,stroke-width:2px,color:#0f172a;
 
     class P1 primary;
     class P2 epi;
     class ML_Sup,ML_Unsup ml;
     class P4 power;
+    class P5 nlp;
     class Q1,Q2,Q3 decision;
 ```"""
     st.markdown(mermaid_code)
 
     # Master Triage Comparison Matrix
-    with st.expander("📋 Master Triage Matrix: 4-Way Cross-Pillar Comparison", expanded=False):
+    with st.expander("📋 Master Triage Matrix: 5-Way Cross-Pillar Comparison", expanded=False):
         matrix_html = r"""
         <div style="overflow-x: auto; margin-top: 0.5rem; margin-bottom: 0.5rem;">
             <table style="width: 100%; border-collapse: collapse; font-size: 0.86rem; text-align: left;">
@@ -90,6 +96,7 @@ flowchart TD
                         <th style="padding: 0.65rem 0.85rem; color: #1e40af; font-weight: 700;">🏥 Observational Epidemiology</th>
                         <th style="padding: 0.65rem 0.85rem; color: #6b21a8; font-weight: 700;">🤖 Machine Learning</th>
                         <th style="padding: 0.65rem 0.85rem; color: #9a3412; font-weight: 700;">📐 Sample Size & Power</th>
+                        <th style="padding: 0.65rem 0.85rem; color: #0369a1; font-weight: 700;">🗣️ Qualitative NLP</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -99,6 +106,7 @@ flowchart TD
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Quantify disease risk, incidence rates, and control observational confounding</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Maximize out-of-sample prediction accuracy or discover latent patient clusters</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Determine minimum sample size needed to detect effect size $\delta$ at $\ge 80\%$ power</td>
+                        <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Extract structured meaning, clinical entities, sentiment, themes, or synthesize answers from unstructured text</td>
                     </tr>
                     <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
                         <td style="padding: 0.6rem 0.85rem; font-weight: 600; color: #334155;">Data Architecture</td>
@@ -106,6 +114,7 @@ flowchart TD
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Cohorts, case-control matching, surveys, demographic registries</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">High-dimensional tabular data, telemetry streams, $N \ge 500$, many features</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Pre-trial planning stage before data collection commences</td>
+                        <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Clinical narratives, discharge summaries, incident reports (Datix), open-ended survey comments, customer reviews</td>
                     </tr>
                     <tr style="border-bottom: 1px solid #e2e8f0; background-color: #ffffff;">
                         <td style="padding: 0.6rem 0.85rem; font-weight: 600; color: #334155;">Key Output Metrics</td>
@@ -113,6 +122,7 @@ flowchart TD
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Relative Risk (RR), Odds Ratio (OR), DSR, Sensitivity/Specificity, NNT</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">PR-AUC, ROC-AUC, Brier Score, Silhouette, Davies-Bouldin, Calinski-Harabasz</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Total Required $N$, Per-Group $n$, Power Curves, Attrition Cushion ($N / (1-L)$)</td>
+                        <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Sentiment valence, TF-IDF weights, Topic coherence ($C_v$ / NPMI), Cosine similarity, Entity span F1, Faithfulness ratio</td>
                     </tr>
                     <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
                         <td style="padding: 0.6rem 0.85rem; font-weight: 600; color: #334155;">Primary Governance</td>
@@ -120,6 +130,7 @@ flowchart TD
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">STROBE Guidelines, PRISMA 2020, STARD</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">TRIPOD-AI, NHS AI Ethics, Four-Fifths 80% Rule</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">NIHR, MRC, FDA Statistical Guidance, SPIRIT</td>
+                        <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Caldicott Principles, HIPAA de-identification, STROBE qualitative criteria, RAGAS Hallucination auditing</td>
                     </tr>
                 </tbody>
             </table>
@@ -142,7 +153,8 @@ flowchart TD
                 "Predict rare clinical event (e.g. ICU Sepsis)",
                 "Forecast sequential time series demand",
                 "Discover unknown sub-phenotypes / patient clusters",
-                "Determine required sample size for a grant proposal"
+                "Determine required sample size for a grant proposal",
+                "Analyze unstructured text, clinical notes, or qualitative comments (NLP)"
             ],
             key="triage_goal_select"
         )
@@ -156,7 +168,8 @@ flowchart TD
                 "Retrospective Case-Control (1:k matching)",
                 "Cross-Sectional Diagnostic Accuracy Study",
                 "High-Dimensional EHR / Telemetry Matrix",
-                "Pre-Study Design Planning Stage"
+                "Pre-Study Design Planning Stage",
+                "Unstructured Text / Clinical Notes / Survey Free-Text"
             ],
             key="triage_data_select"
         )
@@ -181,7 +194,16 @@ flowchart TD
     resolved_border = "#16a34a"
     resolved_rationale = "Testing differences between 2 experimental groups with continuous endpoint."
 
-    if "grant proposal" in triage_goal or "Pre-Study" in triage_data:
+    if "unstructured text" in triage_goal.lower() or "free-text" in triage_data.lower() or "clinical notes" in triage_data.lower():
+        resolved_pillar = "Qualitative Analysis & NLP"
+        resolved_method = "Clinical Text & Natural Language Processing Pipeline"
+        resolved_page = "pages/6_🗣️_Natural_Language_Processing.py"
+        resolved_icon = "🗣️"
+        resolved_color = "#0284c7"
+        resolved_bg = "#f0f9ff"
+        resolved_border = "#0ea5e9"
+        resolved_rationale = "Analyzing qualitative, unstructured textual narratives across rule-based, statistical, or foundation LLM architectures."
+    elif "grant proposal" in triage_goal or "Pre-Study" in triage_data:
         resolved_pillar = "Sample Size & Power"
         resolved_method = "Two Independent Means Sizing (t-test)"
         resolved_page = "pages/4_📐_Sample_Size_and_Power.py"
@@ -779,3 +801,157 @@ flowchart TD
             if st.button(f"Launch {sname} on Page 4 👉", key=f"btn_jump_ss_{skey}", use_container_width=True):
                 st.session_state["sample_size_direct_framework_key"] = skey
                 st.switch_page("pages/4_📐_Sample_Size_and_Power.py")
+
+
+# =====================================================================
+# 6. Qualitative Analysis & Natural Language Processing (NLP) Decision Tree
+# =====================================================================
+
+def render_nlp_decision_tree() -> None:
+    """Renders the comprehensive Qualitative Analysis and Natural Language Processing (NLP)
+
+    decision tree covering all 7 methods across 5 progressive evolutionary levels.
+    """
+    st.markdown("### 🗣️ Qualitative Analysis & Natural Language Processing Decision Tree (7 Methods)")
+    st.markdown(r"""
+    This decision tree guides you from your **Qualitative Text Analysis Objective** 
+    (Sentiment, Term Weighting, Supervised Triage, Unsupervised Themes, Entity Tagging, or Factual Q&A)
+    through **Annotation Availability** (Labeled vs. Cold-Start / Zero-Shot) 
+    and **Computational / Governance Constraints** (CPU Rule-Based vs. Statistical ML vs. Deep Transformers & Foundation LLMs) 
+    to the mathematically and architecturally justified method.
+    """)
+
+    mermaid_code = """```mermaid
+flowchart TD
+    NLPStart(["Qualitative Research Question or Text Dataset"]) --> TaskType{"What is the Primary Qualitative / Text Goal?"}
+
+    %% 1. Sentiment & Negation
+    TaskType -->|"Sentiment & Polarity Scoring"| NegScope{"Does the Text Contain Clinical Negation?"}
+    NegScope -->|"Yes: 'denies pain', 'no fever'"| M1["1. Rule-Based VADER + Clinical NegEx Scope Inversion<br/>(Prefix/Suffix Scope Bounding, [-1, +1] Valence)"]
+    NegScope -->|"No: Standard Review Polarity"| M1_std["1. Standard Lexicon Sentiment Analysis<br/>(Compound Score with Word Weights)"]
+
+    %% 2. Keyword & Importance
+    TaskType -->|"Keyword Weighting & Lexical Similarity"| M2["2. TF-IDF Vectorizer & Cosine Similarity<br/>(Term Frequency-Inverse Document Frequency, Dot Product)"]
+
+    %% 3. Supervised Classification
+    TaskType -->|"Document / Incident Triage & Categorization"| LabelCheck{"Are Annotated Training Labels Available?"}
+    LabelCheck -->|"Yes: Labeled Data Available (N >= 500)"| M3["3. Supervised Multinomial Naive Bayes & Linear SVM<br/>(Laplace Smoothing, Log-Odds Hyperplane)"]
+    LabelCheck -->|"No: Zero-Shot Cold-Start"| M7_zs["7. Foundation LLM Zero-Shot Triage<br/>(NLI Hypothesis Entailment e.g. BART-MNLI)"]
+
+    %% 4. Unsupervised Themes
+    TaskType -->|"Unsupervised Thematic & Concept Discovery"| DiscoveryType{"Discovery Paradigm"}
+    DiscoveryType -->|"Probabilistic Topic Distributions"| M4["4. Latent Dirichlet Allocation (LDA)<br/>(Dirichlet Priors alpha/beta, NPMI Coherence C_v)"]
+    DiscoveryType -->|"Continuous Geometric Space"| M5["5. Dense Semantic Vector Embeddings<br/>(Sentence-Transformers all-MiniLM-L6-v2, 384D)"]
+
+    %% 5. Information Extraction & Q&A
+    TaskType -->|"Entity Extraction & Factual Question Answering"| GenType{"Extraction vs Generative Synthesis"}
+    GenType -->|"Clinical Entities (Conditions, Drugs, Tests)"| M6["6. Clinical Named Entity Recognition (NER)<br/>(IOB Span Tagging, Exact Offsets, Micro F1)"]
+    GenType -->|"Contextual Synthesis & Policy Q&A"| M7_rag["7. Retrieval-Augmented Generation (RAG)<br/>(Context Injection, LLM Prompt, Faithfulness Guardrail)"]
+
+    classDef level1 fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#166534;
+    classDef level2 fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af;
+    classDef level3 fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#854d0e;
+    classDef level4 fill:#faf5ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
+    classDef level5 fill:#fff1f2,stroke:#e11d48,stroke-width:2px,color:#9f1239;
+    classDef decision fill:#f8fafc,stroke:#475569,stroke-width:1.5px,color:#0f172a;
+
+    class M1,M1_std level1;
+    class M2,M3 level2;
+    class M4 level3;
+    class M5 level4;
+    class M6,M7_zs,M7_rag level5;
+    class NLPStart,TaskType,NegScope,LabelCheck,DiscoveryType,GenType decision;
+```"""
+    st.markdown(mermaid_code)
+
+    # Triage Principles Container
+    with st.expander("💡 Qualitative NLP Triage Principles: Rule-Based vs. Statistical vs. Deep LLM RAG", expanded=False):
+        nlp_rules_html = r"""
+        <div style="background-color: #f8fafc; border-left: 4px solid #0284c7; padding: 0.85rem 1.1rem; border-radius: 4px; font-size: 0.88rem; line-height: 1.5; color: #1e293b;">
+            <div style="font-weight: 700; color: #0369a1; margin-bottom: 0.35rem;">
+                🗣️ Architectural Decision Rules for Qualitative Text Analytics
+            </div>
+            • <strong>Clinical Negation Scope Inversion:</strong> Standard sentiment lexicons fail in medical text because "no chest pain" or "denies shortness of breath" contains positive clinical symptoms that naive models score as high morbidity. Always precede sentiment scoring with NegEx regex scope detection to invert valence within a 6-token window.<br>
+            • <strong>Exact Lexical Matching vs. Dense Semantic Embeddings:</strong> TF-IDF is superior when exact terminology, part numbers, or drug codes matter. Dense embeddings (Sentence-Transformers) are required when synonymous phrasing must be matched without shared words (e.g., "sluggish UI" matching "frozen application").<br>
+            • <strong>Supervised Statistical Classifiers vs. Zero-Shot LLMs:</strong> When $\ge 500$ verified historical labels exist, Multinomial Naive Bayes and Linear SVM execute in microseconds with 100% deterministic reproducibility on basic CPUs. When encountering a cold-start classification task with zero training labels, utilize Foundation LLMs via NLI Zero-Shot inference.<br>
+            • <strong>Automated Faithfulness Audits for RAG:</strong> Never deploy standalone generative LLMs on clinical protocols or enterprise SOPs without retrieval grounding. Always compute Faithfulness ($\text{Verified Claims} / \text{Total Claims} \ge 85\%$) to detect hallucinations before surfacing outputs.
+        </div>
+        """
+        render_html(nlp_rules_html)
+
+    # Interactive Method Selector
+    st.markdown("#### ⚡ Quick Qualitative NLP Method Selector")
+    n1, n2 = st.columns(2)
+    with n1:
+        nlp_objective = st.selectbox(
+            "What is your primary qualitative text analysis goal?",
+            options=[
+                "Extract clinical sentiment & detect negation (e.g. 'no chest pain')",
+                "Measure keyword importance & document similarity across text records",
+                "Classify tickets/reports with labeled training examples (Supervised ML)",
+                "Discover latent topics / themes across unlabelled text (Topic Modeling)",
+                "Semantic search & concept matching without exact word overlap",
+                "Extract clinical entities (diseases, drugs, procedures) & IOB spans",
+                "Cold-start zero-shot classification or contextual Q&A with grounded evidence (RAG)"
+            ],
+            key="nlp_tree_obj_select"
+        )
+    with n2:
+        nlp_compute = st.selectbox(
+            "Computational resources & deployment environment:",
+            options=[
+                "Lightweight / CPU / Zero-training rule-based",
+                "Standard statistical NLP (Scikit-Learn / Gensim)",
+                "Deep Transformer / Foundation Model (Sentence-Transformers / Hugging Face)"
+            ],
+            key="nlp_tree_compute_select"
+        )
+
+    # NLP Routing
+    nlp_routing = {
+        "Extract clinical sentiment & detect negation (e.g. 'no chest pain')": (
+            "vader_negex_sentiment",
+            "Rule-Based Sentiment Analysis & Clinical NegEx Scope",
+            "Level 1: Rule-Based & Negation Resolution"
+        ),
+        "Measure keyword importance & document similarity across text records": (
+            "tfidf_vectorizer_similarity",
+            "TF-IDF Vectorization & Pairwise Cosine Similarity",
+            "Level 2: Statistical Vectorization"
+        ),
+        "Classify tickets/reports with labeled training examples (Supervised ML)": (
+            "naive_bayes_svm_classifier",
+            "Supervised Text Classification (Naive Bayes & Linear SVM)",
+            "Level 2: Supervised Text Classification"
+        ),
+        "Discover latent topics / themes across unlabelled text (Topic Modeling)": (
+            "lda_topic_modeling",
+            "Latent Dirichlet Allocation (LDA) Topic Modeling",
+            "Level 3: Thematic Discovery & Topic Modeling"
+        ),
+        "Semantic search & concept matching without exact word overlap": (
+            "dense_embeddings_similarity",
+            "Dense Semantic Embeddings & Vector Search",
+            "Level 4: Dense Continuous Embeddings"
+        ),
+        "Extract clinical entities (diseases, drugs, procedures) & IOB spans": (
+            "clinical_ner_extraction",
+            "Clinical Named Entity Recognition (NER) & Span Tagging",
+            "Level 5: State-of-the-Art Generative AI & NER"
+        ),
+        "Cold-start zero-shot classification or contextual Q&A with grounded evidence (RAG)": (
+            "llm_zeroshot_rag",
+            "LLM Zero-Shot Classification & Retrieval-Augmented Generation (RAG)",
+            "Level 5: State-of-the-Art Generative AI & RAG"
+        )
+    }
+
+    nkey, nname, ntier = nlp_routing.get(nlp_objective, ("vader_negex_sentiment", "Sentiment & NegEx", "Level 1"))
+
+    st.success(f"🎯 **Recommended Method:** `{nname}` — *{ntier}*")
+    col_jump, _ = st.columns([1.5, 2.5])
+    with col_jump:
+        if st.button(f"Launch {nname} on Page 6 👉", key=f"btn_jump_nlp_{nkey}", use_container_width=True):
+            st.session_state["active_nlp_method"] = nkey
+            st.switch_page("pages/6_🗣️_Natural_Language_Processing.py")
+

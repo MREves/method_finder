@@ -2,11 +2,12 @@
 
 Provides a standalone, bird's-eye architectural roadmap and interactive visual
 decision trees across:
-1. Master Cross-Pillar Triage (Statistics vs Epidemiology vs Machine Learning)
+1. Master Cross-Pillar Triage (Statistics vs Epidemiology vs Machine Learning vs NLP)
 2. Classical Statistical Hypothesis Testing (18 Tests, Parametric & Non-Parametric)
 3. Observational Epidemiology & Public Health (17 Methods, Risk, Rates & Screening)
 4. Machine Learning & Predictive Modeling (16 Architectures, Rare Events & Clustering)
 5. Biostatistical Sample Size & Power Planning (10 Frameworks, Attrition & Clusters)
+6. Qualitative Analysis & Natural Language Processing (7 Methods, Rule-Based to LLMs)
 """
 
 import os
@@ -25,7 +26,8 @@ from src.ui_components.flowchart_widgets import (
     render_statistics_decision_tree,
     render_epidemiology_decision_tree,
     render_machine_learning_decision_tree,
-    render_sample_size_decision_tree
+    render_sample_size_decision_tree,
+    render_nlp_decision_tree
 )
 
 st.set_page_config(
@@ -43,10 +45,10 @@ render_roundtrip_navigation_banner()
 st.title("🗺️ Methodology Decision Flowcharts & Process Explainer")
 st.markdown(r"""
 A comprehensive, bird's-eye architectural roadmap across **Classical Statistics**, **Observational Epidemiology**, 
-**Machine Learning**, and **Sample Size Determination**. 
+**Machine Learning**, **Sample Size Determination**, and **Qualitative Analysis (Natural Language Processing)**. 
 
 Follow the visual decision trees below to understand how data types, study designs, sample scale boundaries ($N < 30$ vs. $N \ge 30$), 
-and assumption violations guide you to the mathematically justified analytical method.
+annotation availability, and assumption violations guide you to the mathematically and architecturally justified analytical method.
 """)
 
 # ----------------- Implementation Tracker -----------------
@@ -54,15 +56,16 @@ if st.session_state.get("debug_mode", False) or st.session_state.get("debug_mode
     with st.expander("📌 Decision Flowchart Architecture & Pillar Coverage Tracker", expanded=False):
         st.markdown("""
         **Project Status: Standalone Methodology Process Explainer (Complete)**  
-        This module provides the global architectural perspective of all quantitative methods available in MethodFinder.
+        This module provides the global architectural perspective of all quantitative and qualitative methods available in MethodFinder.
         """)
         st.markdown(r"""
         #### 🌐 Comprehensive Decision Trees & Flowcharts Covered
-        * [x] **Master Cross-Pillar Triage Router**: High-level triage guiding between hypothesis testing, observational risk, predictive modeling, and sample size planning.
+        * [x] **Master Cross-Pillar Triage Router**: High-level triage guiding between hypothesis testing, observational risk, predictive modeling, sample size planning, and qualitative text analysis.
         * [x] **Classical Statistics Decision Tree**: 18 parametric and non-parametric tests, Central Limit Theorem gates ($N \ge 30$), and outlier fallbacks.
         * [x] **Observational Epidemiology Decision Tree**: 17 methods spanning prospective cohorts (RR, IRR, AR), retrospective case-controls (OR, Mantel-Haenszel), cross-sectional diagnostic accuracy (Sens, Spec, ROC), demographic standardization (DSR, SMR), and meta-analysis.
         * [x] **Machine Learning Architecture Tree**: 16 models across regularized regression, severe class imbalance ($< 10\%$), algorithmic fairness audits (Four-Fifths Rule), sequential time series, and unsupervised clustering evaluated via **Silhouette Score**, **Davies-Bouldin Index**, and **Calinski-Harabasz Index**.
         * [x] **Biostatistical Sample Size Planning Tree**: 10 analytical sizing frameworks, minimal clinically important differences (MCID), attrition cushions ($N / (1-L)$), and cluster randomization variance inflation ($\text{VIF} = 1 + (m-1)\rho$).
+        * [x] **Qualitative Analysis & NLP Decision Tree**: 7 methods spanning 5 evolutionary levels from rule-based VADER & Clinical NegEx, TF-IDF, Naive Bayes / Linear SVM, LDA topic modeling, and 384D dense embeddings to Clinical NER and LLM Zero-Shot RAG with Faithfulness audits.
         * [x] **Interactive Simulators & 1-Click Launchers**: Direct deep links from leaf nodes into individual training modules.
         """)
 
@@ -87,13 +90,14 @@ with c_nav8:
 
 st.markdown("---")
 
-# ----------------- 5 Interactive Pillar Tabs -----------------
-tab_master, tab_stat, tab_epi, tab_ml, tab_power = st.tabs([
+# ----------------- 6 Interactive Pillar Tabs -----------------
+tab_master, tab_stat, tab_epi, tab_ml, tab_power, tab_nlp = st.tabs([
     "🌐 Master Cross-Pillar Triage",
     "📊 Classical Statistics Tree",
     "🏥 Epidemiology Tree",
     "🤖 Machine Learning Tree",
-    "📐 Sample Size & Power Tree"
+    "📐 Sample Size & Power Tree",
+    "🗣️ Qualitative Analysis (NLP) Tree"
 ])
 
 with tab_master:
@@ -110,6 +114,9 @@ with tab_ml:
 
 with tab_power:
     render_sample_size_decision_tree()
+
+with tab_nlp:
+    render_nlp_decision_tree()
 
 st.markdown("---")
 st.markdown("""

@@ -30,6 +30,7 @@ from src.ui_components.flowchart_widgets import (
     render_epidemiology_decision_tree,
     render_machine_learning_decision_tree,
     render_sample_size_decision_tree,
+    render_nlp_decision_tree,
     render_html
 )
 
@@ -87,6 +88,13 @@ class TestFlowchartWidgets(unittest.TestCase):
             render_sample_size_decision_tree()
         except Exception as e:
             self.fail(f"render_sample_size_decision_tree crashed: {e}")
+
+    def test_render_nlp_decision_tree(self):
+        """Verifies qualitative analysis / NLP decision tree renders without errors."""
+        try:
+            render_nlp_decision_tree()
+        except Exception as e:
+            self.fail(f"render_nlp_decision_tree crashed: {e}")
 
     def test_render_html_safety(self):
         """Verifies render_html safely cleans whitespace and empty lines."""

@@ -33,6 +33,17 @@ from src.nlp.nlp_engine import (
 
 def render_nlp_mode_selector() -> Tuple[str, str]:
     """Renders the top mode selector: Guided Problem-to-Method Wizard vs. Direct Method Explorer."""
+    method_options = {f"{m['icon']} {m['name']} ({m['category'].split(':')[0]})": k for k, m in NLP_METHODS.items()}
+
+    # Check if a method was pre-selected from Flowcharts or Selector
+    preselected = st.session_state.pop("active_nlp_method", None)
+    if preselected and preselected in NLP_METHODS:
+        st.session_state["nlp_nav_mode_radio"] = "🔍 Direct Method Explorer"
+        for label, k in method_options.items():
+            if k == preselected:
+                st.session_state["nlp_direct_select"] = label
+                break
+
     c_mode1, c_mode2 = st.columns([1.5, 3])
     with c_mode1:
         mode = st.radio(
@@ -57,7 +68,6 @@ def render_nlp_mode_selector() -> Tuple[str, str]:
             meta = NLP_METHODS[selected_method_key]
             st.success(f"**Recommended Method:** {meta['icon']} **{meta['name']}** — *{meta['category']}*")
         else:
-            method_options = {f"{m['icon']} {m['name']} ({m['category'].split(':')[0]})": k for k, m in NLP_METHODS.items()}
             selected_display = st.selectbox(
                 "Select NLP Method Directly:",
                 options=list(method_options.keys()),
