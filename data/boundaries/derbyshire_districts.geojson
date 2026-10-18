@@ -1,0 +1,283 @@
+{
+  "type": "FeatureCollection",
+  "name": "Derbyshire_and_Derby_Districts",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "ons_code": "E07000037",
+        "name": "High Peak",
+        "authority_type": "District Council",
+        "centroid_lat": 53.36,
+        "centroid_lon": -1.88,
+        "area_km2": 542.4
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-1.93, 53.48],
+            [-1.85, 53.49],
+            [-1.76, 53.46],
+            [-1.74, 53.40],
+            [-1.72, 53.34],
+            [-1.75, 53.30],
+            [-1.79, 53.28],
+            [-1.84, 53.26],
+            [-1.91, 53.23],
+            [-1.98, 53.22],
+            [-2.03, 53.26],
+            [-2.02, 53.33],
+            [-2.00, 53.41],
+            [-1.97, 53.46],
+            [-1.93, 53.48]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ons_code": "E07000035",
+        "name": "Derbyshire Dales",
+        "authority_type": "District Council",
+        "centroid_lat": 53.13,
+        "centroid_lon": -1.63,
+        "area_km2": 792.4
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-1.79, 53.28],
+            [-1.72, 53.30],
+            [-1.63, 53.26],
+            [-1.56, 53.22],
+            [-1.53, 53.17],
+            [-1.52, 53.10],
+            [-1.50, 53.04],
+            [-1.52, 52.99],
+            [-1.60, 52.98],
+            [-1.71, 53.00],
+            [-1.80, 53.04],
+            [-1.83, 53.11],
+            [-1.82, 53.18],
+            [-1.84, 53.26],
+            [-1.79, 53.28]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ons_code": "E07000038",
+        "name": "North East Derbyshire",
+        "authority_type": "District Council",
+        "centroid_lat": 53.25,
+        "centroid_lon": -1.45,
+        "area_km2": 275.6
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-1.56, 53.34],
+            [-1.46, 53.36],
+            [-1.38, 53.34],
+            [-1.34, 53.30],
+            [-1.36, 53.24],
+            [-1.37, 53.20],
+            [-1.36, 53.15],
+            [-1.41, 53.13],
+            [-1.48, 53.14],
+            [-1.53, 53.17],
+            [-1.56, 53.22],
+            [-1.52, 53.24],
+            [-1.47, 53.27],
+            [-1.48, 53.31],
+            [-1.56, 53.34]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ons_code": "E07000034",
+        "name": "Chesterfield",
+        "authority_type": "District Council",
+        "centroid_lat": 53.24,
+        "centroid_lon": -1.43,
+        "area_km2": 66.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-1.47, 53.27],
+            [-1.41, 53.28],
+            [-1.37, 53.25],
+            [-1.38, 53.21],
+            [-1.44, 53.20],
+            [-1.48, 53.22],
+            [-1.47, 53.27]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ons_code": "E07000033",
+        "name": "Bolsover",
+        "authority_type": "District Council",
+        "centroid_lat": 53.21,
+        "centroid_lon": -1.28,
+        "area_km2": 160.3
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-1.34, 53.30],
+            [-1.25, 53.31],
+            [-1.21, 53.27],
+            [-1.22, 53.19],
+            [-1.27, 53.13],
+            [-1.32, 53.10],
+            [-1.36, 53.15],
+            [-1.37, 53.20],
+            [-1.36, 53.24],
+            [-1.34, 53.30]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ons_code": "E07000032",
+        "name": "Amber Valley",
+        "authority_type": "District Council",
+        "centroid_lat": 53.05,
+        "centroid_lon": -1.44,
+        "area_km2": 265.4
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-1.53, 53.17],
+            [-1.48, 53.14],
+            [-1.41, 53.13],
+            [-1.36, 53.15],
+            [-1.32, 53.10],
+            [-1.33, 53.04],
+            [-1.37, 53.00],
+            [-1.41, 52.97],
+            [-1.47, 52.97],
+            [-1.52, 52.99],
+            [-1.50, 53.04],
+            [-1.52, 53.10],
+            [-1.53, 53.17]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ons_code": "E07000036",
+        "name": "Erewash",
+        "authority_type": "District Council",
+        "centroid_lat": 52.94,
+        "centroid_lon": -1.31,
+        "area_km2": 109.6
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-1.37, 53.00],
+            [-1.31, 53.02],
+            [-1.26, 52.98],
+            [-1.24, 52.91],
+            [-1.28, 52.87],
+            [-1.34, 52.88],
+            [-1.38, 52.92],
+            [-1.41, 52.95],
+            [-1.41, 52.97],
+            [-1.37, 53.00]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ons_code": "E06000015",
+        "name": "Derby",
+        "authority_type": "Unitary Authority",
+        "centroid_lat": 52.92,
+        "centroid_lon": -1.47,
+        "area_km2": 78.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-1.52, 52.96],
+            [-1.47, 52.97],
+            [-1.41, 52.97],
+            [-1.41, 52.95],
+            [-1.42, 52.90],
+            [-1.46, 52.87],
+            [-1.52, 52.88],
+            [-1.55, 52.92],
+            [-1.52, 52.96]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ons_code": "E07000039",
+        "name": "South Derbyshire",
+        "authority_type": "District Council",
+        "centroid_lat": 52.82,
+        "centroid_lon": -1.53,
+        "area_km2": 338.1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-1.60, 52.98],
+            [-1.52, 52.96],
+            [-1.52, 52.88],
+            [-1.46, 52.87],
+            [-1.42, 52.90],
+            [-1.38, 52.92],
+            [-1.34, 52.88],
+            [-1.36, 52.82],
+            [-1.43, 52.76],
+            [-1.52, 52.73],
+            [-1.61, 52.75],
+            [-1.66, 52.80],
+            [-1.65, 52.88],
+            [-1.60, 52.98]
+          ]
+        ]
+      }
+    }
+  ]
+}
+
