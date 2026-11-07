@@ -383,11 +383,31 @@ def render_risk_difference_visualizations(calcs: Dict[str, Any], meta: Dict[str,
 
     # 3. Interactive NNT Reciprocal Curve
     st.markdown("**3. The Reciprocal Curve: How NNT/NNH Changes with Absolute Risk Difference**")
-    arr_grid = np.linspace(0.005, 0.25, 200)
-    nnt_grid = 1.0 / arr_grid
+    is_favourable = meta.get("favourable_outcome", False) or calcs.get("favourable_outcome", False)
+    is_harmful = (calcs["effect_direction"] == "harmful")
 
-    active_arr = calcs["arr"] if calcs["arr"] > 0 else (abs(calcs["risk_difference"]) if abs(calcs["risk_difference"]) > 0 else 0.05)
-    active_nnt = 1.0 / active_arr if active_arr > 0 else 20.0
+    if is_favourable:
+        active_diff = calcs.get("abi", abs(calcs["risk_difference"]))
+        x_axis_title = "Absolute Benefit Increase (ABI %)"
+        curve_name = "NNT = 1 / ABI"
+        point_text_label = "NNT / NNI"
+    elif is_harmful:
+        active_diff = abs(calcs["risk_difference"])
+        x_axis_title = "Absolute Excess Risk / Harm (RD %)"
+        curve_name = "NNH = 1 / RD"
+        point_text_label = "NNH"
+    else:
+        active_diff = calcs.get("arr", abs(calcs["risk_difference"]))
+        x_axis_title = "Absolute Risk Reduction (ARR %)"
+        curve_name = "NNT = 1 / ARR"
+        point_text_label = "NNT"
+
+    active_diff = active_diff if active_diff > 0 else 0.05
+    active_nnt_or_nnh = 1.0 / active_diff if active_diff > 0 else 20.0
+
+    max_grid_x = max(0.30, active_diff * 1.25)
+    arr_grid = np.linspace(0.005, max_grid_x, 250)
+    nnt_grid = 1.0 / arr_grid
 
     fig_nnt = go.Figure()
     fig_nnt.add_trace(go.Scatter(
@@ -395,27 +415,36 @@ def render_risk_difference_visualizations(calcs: Dict[str, Any], meta: Dict[str,
         y=nnt_grid,
         mode="lines",
         line=dict(color="#2563eb", width=2.5),
-        name="NNT = 1 / ARR"
+        name=curve_name
     ))
     fig_nnt.add_trace(go.Scatter(
-        x=[active_arr * 100.0],
-        y=[active_nnt],
+        x=[active_diff * 100.0],
+        y=[active_nnt_or_nnh],
         mode="markers+text",
-        marker=dict(size=12, color="#dc2626"),
-        text=[f"Current: {active_nnt:.1f} (ARR={active_arr*100.0:.1f}%)"],
+        marker=dict(size=13, color="#dc2626"),
+        text=[f"Current: {point_text_label}={active_nnt_or_nnh:.1f} ({active_diff*100.0:.1f}%)"],
         textposition="top right",
         name="Current Scenario"
     ))
     fig_nnt.update_layout(
-        xaxis_title="Absolute Risk Reduction / Difference (%)",
-        yaxis_title="Number Needed to Treat / Harm",
-        height=300,
+        xaxis_title=x_axis_title,
+        yaxis_title="Number Needed (NNT or NNH)",
+        height=320,
         margin=dict(l=30, r=30, t=30, b=40),
         template="plotly_white",
         yaxis=dict(range=[0, min(100, max(nnt_grid))]),
         showlegend=False
     )
     st.plotly_chart(fig_nnt, use_container_width=True)
+
+    st.markdown("""
+    <div style="background-color: #f8fafc; border-left: 4px solid #64748b; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.85rem; color: #334155; margin-bottom: 1rem;">
+        <strong>💡 How to Interpret the Reciprocal Curve ($y = 1 / x$):</strong><br>
+        • <strong>The curve is mathematically invariant:</strong> It represents the universal reciprocal relationship between absolute percentage differences and clinical workload.<br>
+        • <strong>For Beneficial Treatments & Service Pathways (NNT):</strong> The objective is to sit <strong>further to the right</strong> (larger absolute gain &rarr; <strong>lower NNT</strong>). A low NNT (near 1 to 5) means high clinical efficiency.<br>
+        • <strong>For Adverse Hazards & Drug Side Effects (NNH):</strong> The objective is to sit <strong>closer to the left</strong> (minimal excess risk &rarr; <strong>higher NNH</strong>). A very high NNH (in the hundreds or thousands) means the hazard or adverse effect is exceedingly rare.
+    </div>
+    """, unsafe_allow_html=True)
 
     # 4. Interactive 2x2 Contingency Table Display
     st.markdown("**4. Cohort Contingency Structure (2×2 Matrix & Marginals)**")
