@@ -32,6 +32,7 @@ from src.epi_methods.odds_ratio import (
 
 from src.epi_methods.risk_difference import (
     calculate_risk_difference,
+    calculate_service_target_capacity,
     evaluate_risk_difference_prerequisites,
     generate_risk_difference_demo_data
 )
@@ -94,6 +95,13 @@ from src.epi_methods.risk_stratification import (
     generate_risk_stratification_demo_data
 )
 
+from src.epi_methods.health_inequalities import (
+    calculate_relative_ranks,
+    calculate_sii_rii,
+    evaluate_health_inequalities_prerequisites,
+    generate_inequality_demo_data
+)
+
 __all__ = [
     "generate_derbyshire_standardization_data",
     "get_derbyshire_geojson_path",
@@ -114,6 +122,7 @@ __all__ = [
     "evaluate_odds_ratio_prerequisites",
     "generate_odds_ratio_demo_data",
     "calculate_risk_difference",
+    "calculate_service_target_capacity",
     "evaluate_risk_difference_prerequisites",
     "generate_risk_difference_demo_data",
     "calculate_incidence_rate_ratio",
@@ -149,7 +158,11 @@ __all__ = [
     "evaluate_model_calibration",
     "calculate_decision_curve_analysis",
     "evaluate_risk_stratification_prerequisites",
-    "generate_risk_stratification_demo_data"
+    "generate_risk_stratification_demo_data",
+    "calculate_relative_ranks",
+    "calculate_sii_rii",
+    "evaluate_health_inequalities_prerequisites",
+    "generate_inequality_demo_data"
 ]
 
 

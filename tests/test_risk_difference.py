@@ -16,6 +16,7 @@ try:
     import pandas as pd
     from src.epi_methods.risk_difference import (
         calculate_risk_difference,
+        calculate_service_target_capacity,
         evaluate_risk_difference_prerequisites,
         generate_risk_difference_demo_data
     )
@@ -78,6 +79,42 @@ class TestRiskDifferenceCalculations(unittest.TestCase):
         self.assertIsNone(res["nnt"])
         self.assertIsNotNone(res["nnh"])
         self.assertAlmostEqual(res["nnh"], 1.0 / 0.18, places=2)
+
+    def test_favourable_outcome_service_delivery(self):
+        # Service Delivery MCID: a=275, b=225, c=150, d=350 (n1=500, n0=500)
+        res = calculate_risk_difference(a=275, b=225, c=150, d=350, favourable_outcome=True)
+
+        self.assertTrue(res["favourable_outcome"])
+        self.assertAlmostEqual(res["risk_exposed"], 0.55, places=4)
+        self.assertAlmostEqual(res["risk_unexposed"], 0.30, places=4)
+        self.assertAlmostEqual(res["risk_difference"], 0.25, places=4)
+        self.assertAlmostEqual(res["abi"], 0.25, places=4)
+        self.assertEqual(res["effect_direction"], "protective")
+
+        # NNT = 1 / 0.25 = 4.0
+        self.assertIsNotNone(res["nnt"])
+        self.assertIsNone(res["nnh"])
+        self.assertAlmostEqual(res["nnt"], 4.0, places=2)
+
+    def test_calculate_service_target_capacity(self):
+        # Target: 100 additional MCID patients, ABI = 0.25 (NNT = 4.0), 15% dropout, £500 unit cost
+        cap = calculate_service_target_capacity(
+            target_beneficiaries=100,
+            arr_or_abi=0.25,
+            dropout_rate=0.15,
+            unit_cost=500.0,
+            baseline_rate=0.30
+        )
+
+        self.assertAlmostEqual(cap["nnt"], 4.0, places=2)
+        self.assertEqual(cap["enrolled"], 400)      # ceil(100 * 4) = 400
+        self.assertEqual(cap["referrals"], 471)     # ceil(400 / (1 - 0.15)) = 471
+        self.assertEqual(cap["dropouts"], 71)
+        self.assertAlmostEqual(cap["cost_per_resp"], 2000.0, places=2)
+        self.assertAlmostEqual(cap["total_budget"], 200000.0, places=2)
+        self.assertEqual(cap["usual_resp"], 120)    # round(400 * 0.30) = 120
+        self.assertEqual(cap["interv_resp"], 220)   # round(400 * 0.55) = 220
+        self.assertEqual(cap["add_resp"], 100)
 
     def test_null_difference(self):
         # Parity: a=50, b=450, c=50, d=450
@@ -143,7 +180,13 @@ class TestRiskDifferenceDemoDataGeneration(unittest.TestCase):
             self.skipTest("Scientific stack (numpy/pandas/scipy) not installed in this environment")
 
     def test_all_scenarios_generate_validly(self):
-        scenarios = ["statin_cardiovascular", "smoking_cessation", "occupational_vibration", "patient_feedback_survey"]
+        scenarios = [
+            "statin_cardiovascular",
+            "service_delivery_mcid",
+            "smoking_cessation",
+            "occupational_vibration",
+            "patient_feedback_survey"
+        ]
 
         for sc in scenarios:
             df_cont, df_micro, meta = generate_risk_difference_demo_data(scenario=sc, seed=42)

@@ -24,9 +24,10 @@ def calculate_risk_difference(
     c: int,
     d: int,
     alpha: float = 0.05,
-    continuity_correction: bool = False
+    continuity_correction: bool = False,
+    favourable_outcome: bool = False
 ) -> Dict[str, Any]:
-    """Calculates Risk Difference (RD), Absolute Risk Reduction (ARR), NNT, NNH, SE, and Wald CIs from a 2x2 table.
+    """Calculates Risk Difference (RD), Absolute Risk Reduction (ARR), Absolute Benefit Increase (ABI), NNT, NNH, SE, and Wald CIs from a 2x2 table.
 
     A classical 2x2 contingency cohort table is structured as:
                           Cases (Outcome +)       Non-Cases (Outcome -)       Total
@@ -40,8 +41,12 @@ def calculate_risk_difference(
         Risk Difference (RD) = I_e - I_u
         Linear Standard Error: SE(RD) = sqrt([I_e(1 - I_e)/n1] + [I_u(1 - I_u)/n0])
         95% Wald Confidence Interval = RD ± Z_(1 - alpha/2) * SE(RD)
-        Number Needed to Treat (NNT) = 1 / |RD| (when RD < 0, i.e., protective treatment)
-        Number Needed to Harm (NNH) = 1 / RD (when RD > 0, i.e., harmful hazard)
+        Number Needed to Treat (NNT):
+            - If outcome is adverse (favourable_outcome=False) and RD < 0: NNT = 1 / |RD| = 1 / ARR
+            - If outcome is favourable (favourable_outcome=True) and RD > 0: NNT = 1 / RD = 1 / ABI
+        Number Needed to Harm (NNH):
+            - If outcome is adverse and RD > 0: NNH = 1 / RD
+            - If outcome is favourable and RD < 0: NNH = 1 / |RD|
 
     Args:
         a (int): Count of exposed cases (with outcome).
@@ -50,6 +55,7 @@ def calculate_risk_difference(
         d (int): Count of unexposed non-cases (without outcome).
         alpha (float, optional): Significance level for two-sided confidence intervals. Defaults to 0.05 (95% CI).
         continuity_correction (bool, optional): Whether to apply a 0.5 continuity correction if cells are sparse. Defaults to False.
+        favourable_outcome (bool, optional): True if outcome is a positive/beneficial clinical response (e.g. achieving MCID), False if adverse.
 
     Returns:
         Dict[str, Any]: Comprehensive dictionary containing:
@@ -58,18 +64,20 @@ def calculate_risk_difference(
             - 'risk_exposed': Cumulative incidence in exposed (I_e).
             - 'risk_unexposed': Cumulative incidence in unexposed (I_u).
             - 'risk_difference': Point estimate of Risk Difference (RD = I_e - I_u).
-            - 'arr': Absolute Risk Reduction (|RD| if protective, else 0.0).
+            - 'arr': Absolute Risk Reduction (|RD| if protective adverse event, else 0.0).
+            - 'abi': Absolute Benefit Increase (RD if beneficial favourable event, else 0.0).
+            - 'favourable_outcome': Boolean flag.
             - 'se_rd': Standard error of Risk Difference on the linear scale.
             - 'rd_ci_lower': Lower bound of (1 - alpha) CI for RD.
             - 'rd_ci_upper': Upper bound of (1 - alpha) CI for RD.
-            - 'nnt': Number Needed to Treat (if protective / beneficial), else None.
+            - 'nnt': Number Needed to Treat (if beneficial / protective), else None.
             - 'nnh': Number Needed to Harm (if harmful / hazardous), else None.
-            - 'attributable_fraction_exposed': AF_e % = (RD / I_e) * 100 if harmful.
+            - 'attributable_fraction_exposed': Relative impact percentage.
             - 'z_score': Wald Z-statistic on linear scale (RD / SE).
             - 'p_value_wald': Two-sided Wald p-value for H0: RD = 0.0.
             - 'p_value_chi2': Pearson Chi-Square test p-value (1 d.f.).
             - 'p_value_fisher': Fisher's exact test two-sided p-value.
-            - 'effect_direction': 'harmful' (RD > 0), 'protective' (RD < 0), or 'null' (RD == 0).
+            - 'effect_direction': 'beneficial' / 'protective', 'harmful', or 'null'.
             - 'percentage_point_diff': RD expressed in percentage points (RD * 100).
     """
     applied_cc = continuity_correction or (a == 0 or b == 0 or c == 0 or d == 0)
@@ -109,24 +117,52 @@ def calculate_risk_difference(
         p_value_wald = 1.0
 
     # Effect direction and NNT / NNH
-    if rd > 1e-6:
-        effect_direction = "harmful"
-        arr = 0.0
-        nnh = float(1.0 / rd)
-        nnt = None
-        afe = float((rd / risk_exp) * 100.0) if risk_exp > 0 else 0.0
-    elif rd < -1e-6:
-        effect_direction = "protective"
-        arr = float(abs(rd))
-        nnt = float(1.0 / arr)
-        nnh = None
-        afe = float((arr / risk_unexp) * 100.0) if risk_unexp > 0 else 0.0
+    if favourable_outcome:
+        # Favourable outcome (e.g. MCID achieved, recovery, cessation):
+        # I_e > I_u represents an Absolute Benefit Increase (ABI).
+        if rd > 1e-6:
+            effect_direction = "beneficial"
+            arr = float(rd)
+            abi = float(rd)
+            nnt = float(1.0 / abi)
+            nnh = None
+            afe = float((rd / risk_unexp) * 100.0) if risk_unexp > 0 else 0.0
+        elif rd < -1e-6:
+            effect_direction = "harmful"
+            arr = 0.0
+            abi = 0.0
+            nnh = float(1.0 / abs(rd))
+            nnt = None
+            afe = float((abs(rd) / risk_exp) * 100.0) if risk_exp > 0 else 0.0
+        else:
+            effect_direction = "null"
+            arr = 0.0
+            abi = 0.0
+            nnt = None
+            nnh = None
+            afe = 0.0
     else:
-        effect_direction = "null"
-        arr = 0.0
-        nnt = None
-        nnh = None
-        afe = 0.0
+        # Adverse outcome (e.g. MACE, mortality, HAVS, disease incidence):
+        # I_e < I_u represents an Absolute Risk Reduction (ARR).
+        abi = 0.0
+        if rd > 1e-6:
+            effect_direction = "harmful"
+            arr = 0.0
+            nnh = float(1.0 / rd)
+            nnt = None
+            afe = float((rd / risk_exp) * 100.0) if risk_exp > 0 else 0.0
+        elif rd < -1e-6:
+            effect_direction = "protective"
+            arr = float(abs(rd))
+            nnt = float(1.0 / arr)
+            nnh = None
+            afe = float((arr / risk_unexp) * 100.0) if risk_unexp > 0 else 0.0
+        else:
+            effect_direction = "null"
+            arr = 0.0
+            nnt = None
+            nnh = None
+            afe = 0.0
 
     # Classical 2x2 Hypothesis tests (using raw counts)
     table_raw = np.array([[a, b], [c, d]])
@@ -154,6 +190,8 @@ def calculate_risk_difference(
         "risk_unexposed": float(risk_unexp),
         "risk_difference": float(rd),
         "arr": float(arr),
+        "abi": float(abi),
+        "favourable_outcome": favourable_outcome,
         "se_rd": float(se_rd),
         "rd_ci_lower": float(rd_ci_lower),
         "rd_ci_upper": float(rd_ci_upper),
@@ -167,6 +205,70 @@ def calculate_risk_difference(
         "continuity_applied": applied_cc,
         "effect_direction": effect_direction,
         "percentage_point_diff": float(rd * 100.0)
+    }
+
+
+def calculate_service_target_capacity(
+    target_beneficiaries: int,
+    arr_or_abi: float,
+    dropout_rate: float = 0.0,
+    unit_cost: float = 0.0,
+    baseline_rate: float = 0.0
+) -> Dict[str, Any]:
+    """Calculates required service delivery enrolments, referrals, and commissioning budget
+
+    needed to achieve a targeted number of patients reaching a clinically meaningful difference (MCID).
+
+    Formulas:
+        NNT = 1.0 / abs(arr_or_abi)
+        Required Enrolments = ceil(target_beneficiaries * NNT)
+        Required Referrals = ceil(Required Enrolments / (1.0 - dropout_rate))
+        Cost per Additional Beneficiary = unit_cost * NNT
+        Total Service Budget = Required Enrolments * unit_cost
+
+    Args:
+        target_beneficiaries: Desired number of additional patients achieving clinically meaningful improvement (MCID).
+        arr_or_abi: Absolute Risk Reduction (ARR) or Absolute Benefit Increase (ABI) as a proportion in (0, 1].
+        dropout_rate: Proportion of patients who drop out or fail to complete the pathway (0.0 to 0.95).
+        unit_cost: Service delivery cost per enrolled patient (£).
+        baseline_rate: Standard care baseline response rate (e.g. 0.30).
+
+    Returns:
+        Dict with capacity requirements, funnel steps, and financial projections.
+    """
+    eff = abs(float(arr_or_abi))
+    if eff < 1e-6:
+        eff = 0.01  # Guard against division by zero
+
+    nnt = float(1.0 / eff)
+    target = max(1, int(target_beneficiaries))
+    dr = min(0.95, max(0.0, float(dropout_rate)))
+    cost = max(0.0, float(unit_cost))
+    base_rate = min(1.0, max(0.0, float(baseline_rate)))
+
+    enrolled = int(np.ceil(target * nnt))
+    referrals = int(np.ceil(enrolled / (1.0 - dr))) if dr < 1.0 else enrolled
+    cost_per_beneficiary = float(cost * nnt)
+    total_budget = float(enrolled * cost)
+
+    usual_responders = int(round(enrolled * base_rate))
+    interv_responders = int(round(enrolled * min(1.0, base_rate + eff)))
+    add_responders = int(interv_responders - usual_responders)
+
+    return {
+        "target_beneficiaries": target,
+        "arr_or_abi": eff,
+        "nnt": nnt,
+        "dropout_rate": dr,
+        "unit_cost": cost,
+        "enrolled": enrolled,
+        "referrals": referrals,
+        "dropouts": referrals - enrolled,
+        "cost_per_resp": cost_per_beneficiary,
+        "total_budget": total_budget,
+        "usual_resp": usual_responders,
+        "interv_resp": interv_responders,
+        "add_resp": add_responders
     }
 
 
@@ -335,6 +437,7 @@ def generate_risk_difference_demo_data(
             "title": "Regional Secondary Prevention Statin Trial (Beneficial Intervention)",
             "domain": "Cardiovascular Preventive Medicine & Clinical Pharmacology",
             "description": "A hypothetical 5-year double-blind randomized clinical trial simulating high-intensity statin therapy versus standard care in 2,000 adult patients with pre-existing coronary artery disease recruited across regional cardiology clinics. Evaluates prevention of major adverse cardiovascular events (MACE).",
+            "favourable_outcome": False,
             "exposure_name": "High-Intensity Statin Therapy (80mg)",
             "exposure_levels": ("Statin Therapy", "Standard Care / Placebo"),
             "outcome_name": "Major Adverse Cardiac Event (5-Yr MACE)",
@@ -347,12 +450,32 @@ def generate_risk_difference_demo_data(
             "expected_effect": "Protective (ARR = 5.0%, NNT = 20)",
             "clinical_takeaway": "Statin therapy reduces 5-year cardiac events from 9.0% down to 4.0%, achieving an Absolute Risk Reduction (ARR) of 5.0% (95% CI: [2.8%, 7.2%]). The Number Needed to Treat (NNT) is 20 (95% CI: [14, 36]) — treating 20 high-risk patients over 5 years prevents exactly 1 major cardiac event.",
             "loss_to_follow_up_pct": 2.1,
-            "disclaimer": "Made-up example scenario with synthetic data generated for educational illustration only."
+            "disclaimer": "⚠️ Educational Disclaimer: Made-up example scenario with synthetic data generated for educational illustration only."
+        },
+        "service_delivery_mcid": {
+            "title": "Community Virtual Ward & Pulmonary Rehab (MCID Target Focus)",
+            "domain": "Health Services Research & Healthcare Pathway Redesign",
+            "description": "A hypothetical 6-month randomized service delivery evaluation of an integrated community virtual ward and pulmonary rehabilitation pathway versus routine primary care for 1,000 patients with chronic respiratory conditions. Evaluates the proportion achieving a Minimally Clinically Important Difference (MCID, >= 30m increase on 6-Minute Walk Test or >= 2pt drop in CAT score).",
+            "favourable_outcome": True,
+            "exposure_name": "Care Pathway (Community Virtual Ward & Rehab vs Routine Primary Care)",
+            "exposure_levels": ("Community Virtual Ward & Rehab", "Routine Primary Care"),
+            "outcome_name": "Clinically Meaningful Improvement (MCID Achieved)",
+            "outcome_levels": ("Achieved MCID (+)", "Did Not Achieve MCID (-)"),
+            "n_exposed": 500,
+            "n_unexposed": 500,
+            "p_exposed": 0.55,      # 275 cases (55.0%)
+            "p_unexposed": 0.30,    # 150 cases (30.0%)
+            "study_design": "rct",
+            "expected_effect": "Beneficial Service Model (ABI = +25.0%, NNT = 4.0)",
+            "clinical_takeaway": "Enrolling in the community virtual ward increases the MCID achievement rate from 30.0% to 55.0% (Absolute Benefit Increase = 25.0%, 95% CI: [18.8%, 31.2%]). The Number Needed to Treat (NNT / NNI) is 4.0 (95% CI: [3.2, 5.3]) — for every 4 patients enrolled, 1 additional patient achieves a clinically meaningful functional improvement beyond routine primary care.",
+            "loss_to_follow_up_pct": 2.8,
+            "disclaimer": "⚠️ Educational Disclaimer: All patient counts and clinical scores in this scenario are entirely synthetic, made-up example data for teaching and statistical demonstration."
         },
         "smoking_cessation": {
             "title": "All Meadows Community Smoking Cessation Pharmacotherapy Initiative",
             "domain": "Substance Misuse & Public Health Intervention",
             "description": "A hypothetical 1-year community randomized trial evaluating combined varenicline pharmacotherapy plus behavioral counseling versus behavioral counseling alone among 800 heavy smokers recruited from All Meadows, Riverside, and Inner City GP practices.",
+            "favourable_outcome": False,
             "exposure_name": "Varenicline + Behavioral Counseling",
             "exposure_levels": ("Combined Pharmacotherapy", "Counseling Alone"),
             "outcome_name": "Smoking Relapse at 12 Months",
@@ -365,7 +488,7 @@ def generate_risk_difference_demo_data(
             "expected_effect": "Protective against Relapse (ARR = 20.0%, NNT = 5)",
             "clinical_takeaway": "Adding pharmacotherapy cuts the 1-year relapse rate from 65.0% to 45.0% (Absolute Risk Reduction = 20.0%, 95% CI: [13.2%, 26.8%]). The Number Needed to Treat (NNT) is 5 — enrolling 5 smokers in combined therapy produces 1 additional sustained long-term quitter.",
             "loss_to_follow_up_pct": 3.8,
-            "disclaimer": "Made-up example scenario with synthetic data generated for educational illustration only."
+            "disclaimer": "⚠️ Educational Disclaimer: Made-up example scenario with synthetic data generated for educational illustration only."
         },
         "occupational_vibration": {
             "title": "Regional Quarrying & Industrial Hand-Arm Vibration Cohort (Harmful Hazard)",
@@ -499,7 +622,7 @@ def generate_risk_difference_demo_data(
     df_microdata = pd.DataFrame(participants)
 
     # Attach calculation results to metadata
-    calcs = calculate_risk_difference(a, b, c, d)
+    calcs = calculate_risk_difference(a, b, c, d, favourable_outcome=cfg.get("favourable_outcome", False))
     meta = {
         **cfg,
         "scenario_key": scenario,

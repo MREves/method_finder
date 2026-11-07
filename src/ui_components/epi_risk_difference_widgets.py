@@ -20,6 +20,7 @@ import plotly.express as px
 
 from src.epi_methods.risk_difference import (
     calculate_risk_difference,
+    calculate_service_target_capacity,
     evaluate_risk_difference_prerequisites,
     generate_risk_difference_demo_data
 )
@@ -47,7 +48,7 @@ def render_risk_difference_plain_english_guide():
             """)
 
             st.markdown(r"""
-            #### 2. What is Number Needed to Treat (NNT)?
+            #### 2. What is Number Needed to Treat (NNT) for Drugs?
             * For beneficial treatments ($RD < 0$), **NNT** indicates how many patients must receive the therapy to prevent **exactly 1 bad health event** (such as 1 heart attack, stroke, or death):
               $$\text{NNT} = \frac{1}{|\text{Risk Difference}|} = \frac{1}{\text{Absolute Risk Reduction (ARR)}}$$
             * *Example:* If a cholesterol-lowering statin reduces 5-year cardiac events by $5\%$ ($0.05$):
@@ -79,6 +80,30 @@ def render_risk_difference_plain_english_guide():
         #### 5. Survey & Feedback Analytics: The "Percentage Point Difference"
         * **Customer & Patient Experience:** When comparing feedback between demographics (e.g. young patients aged $\le 18$ vs adults aged $19+$), Risk Difference is universally referred to as the **Percentage Point Difference** (or Prevalence Difference).
         * *Example:* If $80\%$ of youth give positive feedback vs. $60\%$ of adults, the difference is $+20.0$ percentage points ($80\% - 60\% = +20\%$).
+        """)
+
+        st.markdown(r"""
+        #### 6. NNT in Service Delivery Models: Achieving Clinically Meaningful Outcomes (MCID)
+        * **Beyond Drug Treatments:** Can NNT be applied to complex interventions, service delivery pathways, or virtual wards? **Yes, absolutely.**
+        * **The Clinical Objective:** Instead of preventing an adverse event, service models frequently aim to achieve a **favourable clinical improvement**, such as reaching a **Minimally Clinically Important Difference (MCID)** on a validated score (e.g., $\ge 30\text{m}$ increase on 6-Minute Walk Test in pulmonary rehab, or $\ge 2\text{pt}$ drop on CAT symptom score).
+        * **The Counterfactual (Comparator) Requirement:**
+          NNT cannot be calculated from the new service's raw success rate alone. We must compare against standard or routine care ($CER$):
+          $$\text{Absolute Benefit Increase (ABI)} = \text{Intervention MCID Rate} - \text{Usual Care MCID Rate}$$
+          $$\text{Number Needed to Treat / Intervene (NNT / NNI)} = \frac{1}{\text{ABI}} = \frac{1}{EER - CER}$$
+        * *Example:* If routine care achieves MCID in $30\%$ of patients, and an integrated community virtual ward achieves MCID in $55\%$ ($ABI = +25\%$):
+          $$\text{NNT} = \frac{1}{0.25} = \mathbf{4 \text{ patients}}$$
+          Enrolling 4 patients in the virtual ward produces **1 additional patient achieving MCID** beyond routine care!
+
+        #### 7. Target-Driven Service Sizing & Commissioning Workload Forecasting
+        * **The Commissioning Question:** *"Our Integrated Care Board (ICB) has set a commissioning target of 100 additional patients achieving clinically meaningful recovery this year. How many patients must our service enroll and recruit?"*
+        * **Required Enrolments:**
+          $$\text{Enrolments Required} = \text{Target Additional Beneficiaries} \times \text{NNT} = 100 \times 4 = \mathbf{400 \text{ patients}}$$
+        * **Adjusting for Pathway Attrition (Drop-out Rate):**
+          In real-world operations, not every referred patient completes the pathway. If $15\%$ drop out:
+          $$\text{Initial Referrals Needed} = \frac{\text{Enrolments Required}}{1 - \text{Drop-out Rate}} = \frac{400}{1 - 0.15} \approx \mathbf{471 \text{ referrals}}$$
+        * **Commissioning Cost per Additional Responder:**
+          If the service model costs $£500$ per enrolled participant:
+          $$\text{Cost per Additional MCID Responder} = \text{Unit Cost} \times \text{NNT} = £500 \times 4 = \mathbf{£2,000}$$
         """)
 
         st.info(r"""
@@ -133,31 +158,43 @@ def render_risk_difference_dashboard(calcs: Dict[str, Any], meta: Dict[str, Any]
     """Renders summary metric cards for Risk Difference and NNT/NNH."""
     st.markdown("### 📊 Primary Epidemiological Effect Measures")
 
+    is_favourable = meta.get("favourable_outcome", False) or calcs.get("favourable_outcome", False)
     rd_pct = calcs["risk_difference"] * 100.0
     rd_ll = calcs["rd_ci_lower"] * 100.0
     rd_ul = calcs["rd_ci_upper"] * 100.0
 
+    # Statistical significance determination
+    is_sig = (calcs["rd_ci_lower"] > 0 and calcs["rd_ci_upper"] > 0) or (calcs["rd_ci_lower"] < 0 and calcs["rd_ci_upper"] < 0)
+    sig_label = "🟢 Significant (p < 0.05)" if is_sig else "⚪ Not Sig. (p ≥ 0.05)"
+
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.metric(
-            label="Cumulative Risk (Exposed / Treated)",
+            label="Cumulative Risk / Response (Exposed / Treated)",
             value=f"{calcs['risk_exposed'] * 100.0:.1f}%",
-            help="Proportion of exposed or treated participants who developed the outcome: a / (a + b)"
+            help="📌 What it is: Proportion of exposed/treated participants with the outcome: a / (a + b).\n\n• Interpretation: Baseline frequency of events or response in the intervention cohort."
         )
     with c2:
         st.metric(
-            label="Cumulative Risk (Unexposed / Control)",
+            label="Cumulative Risk / Response (Unexposed / Control)",
             value=f"{calcs['risk_unexposed'] * 100.0:.1f}%",
-            help="Proportion of unexposed or control participants who developed the outcome: c / (c + d)"
+            help="📌 What it is: Proportion of unexposed/control participants with the outcome: c / (c + d).\n\n• Interpretation: Counterfactual frequency under routine standard care."
         )
     with c3:
         rd_sign = "+" if rd_pct > 0 else ""
+        rd_label = "Absolute Benefit Increase (ABI)" if is_favourable else "Risk Difference (RD / ARR)"
         st.metric(
-            label="Risk Difference (RD / ARR)",
+            label=rd_label,
             value=f"{rd_sign}{rd_pct:.2f}%",
-            delta=f"95% CI: [{rd_ll:.2f}%, {rd_ul:.2f}%]",
-            delta_color="off",
-            help="Absolute Risk Difference = I_e - I_u. In beneficial trials, called Absolute Risk Reduction (ARR)."
+            delta=f"{sig_label} | 95% CI: [{rd_ll:.2f}%, {rd_ul:.2f}%]",
+            delta_color="normal",
+            help=(
+                "📌 What it is: Direct subtraction of event proportions between groups: I_e - I_u.\n\n"
+                "• Interpretation:\n"
+                "  - Adverse outcomes (ARR): Absolute percentage points of bad events prevented.\n"
+                "  - Favourable outcomes (ABI): Absolute percentage points of additional patients achieving MCID/recovery.\n\n"
+                "• Statistical Significance: If the 95% CI excludes 0.0%, the difference is statistically significant (p < 0.05)."
+            )
         )
     with c4:
         st.metric(
@@ -165,37 +202,51 @@ def render_risk_difference_dashboard(calcs: Dict[str, Any], meta: Dict[str, Any]
             value=f"{calcs['se_rd'] * 100.0:.2f}%",
             delta=f"z = {calcs['z_score']:.2f}",
             delta_color="off",
-            help="Binomial standard error on the linear percentage scale: sqrt([I_e(1-I_e)/n1] + [I_u(1-I_u)/n0])"
+            help="📌 What it is: Binomial standard error on the linear percentage scale: sqrt([I_e(1-I_e)/n1] + [I_u(1-I_u)/n0])."
         )
 
     c5, c6, c7, c8 = st.columns(4)
     with c5:
         if calcs["nnt"] is not None:
+            nnt_label = "Number Needed to Treat / Intervene (NNT / NNI)" if is_favourable else "Number Needed to Treat (NNT)"
             st.metric(
-                label="Number Needed to Treat (NNT)",
+                label=nnt_label,
                 value=f"{calcs['nnt']:.1f}",
-                help="Average number of patients required to treat to prevent 1 bad health event: 1 / |RD|"
+                help=(
+                    "📌 What is Number Needed to Treat (NNT)?\n\n"
+                    "• Definition: The reciprocal of the absolute risk difference: 1 / |RD|.\n\n"
+                    "• Interpretation:\n"
+                    "  - Drug trials: Number of patients who must be treated to prevent 1 adverse event (e.g., NNT=20 to prevent 1 MACE).\n"
+                    "  - Service delivery: Number of patients who must complete the pathway for 1 additional patient to achieve MCID.\n\n"
+                    "• Rule: A lower NNT indicates a more potent, high-yield intervention."
+                )
             )
         elif calcs["nnh"] is not None:
             st.metric(
                 label="Number Needed to Harm (NNH)",
                 value=f"{calcs['nnh']:.1f}",
-                help="Average number of individuals exposed to the hazard to cause 1 additional case of disease: 1 / RD"
+                help="📌 What is Number Needed to Harm (NNH)?\n\n• Definition: 1 / RD.\n\n• Interpretation: Number of individuals exposed to the hazard to cause 1 additional case of disease."
             )
         else:
             st.metric(label="NNT / NNH", value="N/A (Null)")
     with c6:
-        if calcs["effect_direction"] == "harmful":
+        if is_favourable:
+            st.metric(
+                label="Relative Efficacy Gain (REI)",
+                value=f"{calcs['attributable_fraction_exposed']:.1f}%",
+                help="📌 What it is: Relative percentage gain in response rate above usual care: (I_e - I_u) / I_u."
+            )
+        elif calcs["effect_direction"] == "harmful":
             st.metric(
                 label="Attributable Fraction (Exposed)",
                 value=f"{calcs['attributable_fraction_exposed']:.1f}%",
-                help="Proportion of disease in the exposed cohort attributable to exposure: (I_e - I_u) / I_e"
+                help="📌 What it is: Proportion of disease in the exposed cohort attributable to exposure: (I_e - I_u) / I_e."
             )
         else:
             st.metric(
                 label="Relative Risk Reduction (RRR)",
                 value=f"{calcs['attributable_fraction_exposed']:.1f}%",
-                help="Relative reduction in disease: (I_u - I_e) / I_u"
+                help="📌 What it is: Relative percentage drop in disease risk compared to control: (I_u - I_e) / I_u."
             )
     with c7:
         p_val = calcs["p_value_wald"]
@@ -203,7 +254,7 @@ def render_risk_difference_dashboard(calcs: Dict[str, Any], meta: Dict[str, Any]
         st.metric(
             label="Wald Test (H0: RD = 0.0)",
             value=f"p = {p_txt}",
-            help="Wald z-test statistic on linear scale: RD / SE(RD)"
+            help="Wald z-test statistic on linear scale: RD / SE(RD). Evaluates whether the absolute difference differs from zero."
         )
     with c8:
         p_fish = calcs["p_value_fisher"]
@@ -212,6 +263,28 @@ def render_risk_difference_dashboard(calcs: Dict[str, Any], meta: Dict[str, Any]
             label="Fisher's Exact Test",
             value=f"p = {p_fish_txt}",
             help="Exact hypergeometric test for the 2x2 contingency table (robust to sparse cells)."
+        )
+
+    # Dedicated prominent statistical significance callout banner
+    if calcs.get("nnt") is not None:
+        nnt_str = f"NNT = {calcs['nnt']:.1f} patients"
+    elif calcs.get("nnh") is not None:
+        nnt_str = f"NNH = {calcs['nnh']:.1f}"
+    else:
+        nnt_str = "NNT = N/A"
+
+    if is_sig:
+        st.success(
+            f"✅ **Statistical Significance Flag:** The Risk Difference ({rd_sign}{rd_pct:.2f}%) and NNT "
+            f"({nnt_str}) are "
+            f"**STATISTICALLY SIGNIFICANT** (Wald p = {p_txt}, 95% CI: [{rd_ll:.2f}%, {rd_ul:.2f}%]). "
+            f"Because the 95% confidence interval does not span zero, there is credible evidence of a real difference between the groups."
+        )
+    else:
+        st.warning(
+            f"⚠️ **Statistical Significance Flag:** The Risk Difference ({rd_sign}{rd_pct:.2f}%) is "
+            f"**NOT STATISTICALLY SIGNIFICANT** (Wald p = {p_txt}, 95% CI: [{rd_ll:.2f}%, {rd_ul:.2f}%]). "
+            f"Because the 95% confidence interval crosses zero (no difference), the Number Needed to Treat (NNT) spans infinity and should be interpreted with extreme caution."
         )
 
 
@@ -379,6 +452,135 @@ def render_risk_difference_visualizations(calcs: Dict[str, Any], meta: Dict[str,
     ])
 
     st.dataframe(df_2x2_display, use_container_width=True, hide_index=True)
+
+
+def render_service_target_capacity_calculator(calcs: Dict[str, Any], meta: Dict[str, Any]):
+    """Renders the interactive Target-Driven Service Sizing and Capacity Forecasting calculator.
+
+    Enables healthcare managers and commissioners to calculate required enrolments, referrals,
+    and commissioning budget based on target additional patients achieving clinically meaningful difference (MCID).
+    """
+    with st.expander("🎯 Target-Driven Service Sizing & Capacity Forecasting Calculator", expanded=False):
+        st.markdown("""
+        When commissioning or expanding a clinical service delivery pathway (such as a **Virtual Ward**, 
+        **Pulmonary Rehabilitation**, or **Specialist Diabetes Clinic**), service directors typically work backwards from a target: 
+        *"How many additional patients do we want to achieve a clinically meaningful improvement (MCID), and what capacity and budget do we need to fund?"*
+        
+        Using the **Number Needed to Treat / Intervene (NNT / NNI)** derived from the trial/audit, this calculator forecasts:
+        1. **Required Pathway Completions (Enrolments)**
+        2. **Required Initial Referrals** (adjusting for real-world pathway drop-out / attrition)
+        3. **Commissioning Cost per Additional Responder** & **Total Service Budget Required**
+        """)
+
+        is_favourable = meta.get("favourable_outcome", False) or calcs.get("favourable_outcome", False)
+        arr_or_abi = calcs.get("abi", calcs.get("arr", abs(calcs["risk_difference"])))
+        if arr_or_abi <= 0.0001:
+            arr_or_abi = 0.05
+
+        col_c1, col_c2, col_c3 = st.columns(3)
+        with col_c1:
+            target_pts = st.number_input(
+                "Target Additional Responders (MCID):",
+                min_value=1,
+                max_value=50000,
+                value=100,
+                step=10,
+                help="Desired number of additional patients reaching a clinically meaningful difference (MCID) beyond standard care."
+            )
+        with col_c2:
+            drop_pct = st.slider(
+                "Pathway Drop-out / Attrition Rate (%):",
+                min_value=0.0,
+                max_value=60.0,
+                value=15.0,
+                step=1.0,
+                help="Proportion of referred patients who do not complete the pathway (e.g., DNA, withdrawal, transfer)."
+            )
+        with col_c3:
+            unit_cost = st.number_input(
+                "Cost per Enrolled Patient (£):",
+                min_value=0.0,
+                max_value=20000.0,
+                value=500.0,
+                step=50.0,
+                help="Service delivery / commissioning cost per patient enrolled in the intervention pathway."
+            )
+
+        # Execute capacity forecasting
+        cap = calculate_service_target_capacity(
+            target_beneficiaries=target_pts,
+            arr_or_abi=arr_or_abi,
+            dropout_rate=drop_pct / 100.0,
+            unit_cost=unit_cost,
+            baseline_rate=calcs.get("risk_unexposed", 0.0)
+        )
+
+        # Metric cards
+        m1, m2, m3, m4 = st.columns(4)
+        with m1:
+            st.metric(
+                label="NNT / NNI (Workload Ratio)",
+                value=f"{cap['nnt']:.1f}",
+                help="Number of patients who must complete the pathway for 1 additional patient to achieve MCID."
+            )
+        with m2:
+            st.metric(
+                label="Required Enrolments",
+                value=f"{cap['enrolled']:,}",
+                help="Total patients who must complete the intervention pathway: Target × NNT."
+            )
+        with m3:
+            st.metric(
+                label="Required Initial Referrals",
+                value=f"{cap['referrals']:,}",
+                delta=f"+{cap['dropouts']:,} buffer for drop-out",
+                delta_color="off",
+                help="Referrals required accounting for pathway drop-out: Enrolments / (1 - Drop-out Rate)."
+            )
+        with m4:
+            st.metric(
+                label="Total Commissioning Budget",
+                value=f"£{cap['total_budget']:,.0f}",
+                delta=f"£{cap['cost_per_resp']:,.0f} per additional MCID",
+                delta_color="off",
+                help="Total budget needed: Enrolments × Unit Cost."
+            )
+
+        # Funnel Flow Diagram
+        fig_funnel = go.Figure(go.Funnel(
+            y=[
+                "1. Initial Referrals Required",
+                "2. Completed Pathway Enrolments",
+                "3. Total Responders (Intervention Pathway)",
+                "4. Additional Responders (Target MCID Achieved)"
+            ],
+            x=[
+                cap["referrals"],
+                cap["enrolled"],
+                cap["interv_resp"],
+                cap["add_resp"]
+            ],
+            textposition="inside",
+            textinfo="value+percent initial",
+            marker=dict(color=["#2563eb", "#0284c7", "#059669", "#10b981"])
+        ))
+        fig_funnel.update_layout(
+            title="<b>Service Delivery Patient Flow & Attrition Pipeline Funnel</b>",
+            height=340,
+            margin=dict(l=20, r=20, t=40, b=20)
+        )
+        st.plotly_chart(fig_funnel, use_container_width=True)
+
+        st.markdown(f"""
+        <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 0.9rem; border-radius: 6px; font-size: 0.88rem; color: #065f46;">
+            <strong>💡 Capacity & Commissioning Summary:</strong><br>
+            To achieve your commissioning target of <strong>{target_pts:,} additional patients</strong> reaching clinically meaningful improvement (MCID), 
+            the service must receive <strong>{cap['referrals']:,} referrals</strong> from primary care/ED. 
+            Accounting for an anticipated <strong>{drop_pct:.0f}% drop-out rate</strong>, <strong>{cap['enrolled']:,} patients</strong> will complete treatment. 
+            At an estimated cost of <strong>£{unit_cost:,.0f}</strong> per enrolled participant, the required commissioning budget is 
+            <strong>£{cap['total_budget']:,.0f}</strong> (an effective investment of <strong>£{cap['cost_per_resp']:,.0f}</strong> per additional clinically meaningful responder beyond standard care).
+        </div>
+        """, unsafe_allow_html=True)
 
 
 def render_risk_difference_excel_guide(calcs: Dict[str, Any], meta: Dict[str, Any]):
@@ -781,59 +983,80 @@ def render_risk_difference_module(active_method_key: str, method_info: Dict[str,
     # 1. Plain English Guide
     render_risk_difference_plain_english_guide()
 
-    # 2. Sidebar Controls
-    st.sidebar.header("🧪 Absolute Risk Study Settings")
-    st.sidebar.markdown("**Study Scenarios & Contingency Parameters:**")
+    st.markdown("---")
 
-    rd_scenario_choice = st.sidebar.selectbox(
-        "Study Scenario:",
-        options=["statin_cardiovascular", "smoking_cessation", "occupational_vibration", "patient_feedback_survey", "custom"],
-        format_func=lambda s: {
-            "statin_cardiovascular": "💊 Regional Secondary Prevention Statin Trial (Beneficial, NNT = 20)",
-            "smoking_cessation": "🚭 All Meadows Smoking Cessation Pharmacotherapy Trial (Beneficial, NNT = 5)",
-            "occupational_vibration": "⛏️ Regional Pneumatic Tool Vibration Cohort (Harmful, NNH ≈ 5.6)",
-            "patient_feedback_survey": "📋 NHS Patient Experience Survey (Percentage Point Difference = +20%)",
-            "custom": "⚙️ Custom 2×2 Table Input (Enter Your Own Counts)"
-        }[s],
-        index=0,
-        help="Select a realistic clinical/public health scenario or enter custom 2x2 contingency table counts."
-    )
-    st.sidebar.caption("⚠️ **Data Notice:** Scenarios, populations, and event counts are made-up examples synthetically simulated for educational and illustrative purposes only.")
+    # 2. Scenario Selector & Configuration Controls (Prominently on Main Page)
+    st.markdown("### 🎯 Configure Study Scenario & Parameters")
+    st.caption("Select from realistic clinical drug trials, service delivery pathways (MCID), occupational cohorts, or enter custom 2×2 parameters.")
+
+    col_sc1, col_sc2 = st.columns([3, 2])
+    with col_sc1:
+        rd_scenario_choice = st.selectbox(
+            "Select Study Scenario:",
+            options=["statin_cardiovascular", "service_delivery_mcid", "smoking_cessation", "occupational_vibration", "patient_feedback_survey", "custom"],
+            format_func=lambda s: {
+                "statin_cardiovascular": "💊 Drug Trial: Statin Secondary Prevention (Beneficial Drug, NNT = 20)",
+                "service_delivery_mcid": "🏥 Service Delivery: Community Virtual Ward & Rehab (MCID Target Focus, NNT = 4.0)",
+                "smoking_cessation": "🚭 Drug Trial: Smoking Cessation Pharmacotherapy (Beneficial Drug, NNT = 5)",
+                "occupational_vibration": "⛏️ Occupational Cohort: Pneumatic Tool Vibration (Harmful Hazard, NNH ≈ 5.6)",
+                "patient_feedback_survey": "📋 Survey Feedback: NHS Patient Experience (Prevalence Difference = +20%)",
+                "custom": "⚙️ Custom 2×2 Table Input (Enter Your Own Counts)"
+            }[s],
+            index=0,
+            key="rd_scenario_choice",
+            help="Select a clinical drug trial, service delivery model, occupational cohort, or enter custom 2x2 counts."
+        )
+    with col_sc2:
+        st.info("💡 **Scenario Navigator:** Switch between preventative drug trials (NNT), service delivery pathways achieving MCID, or hazardous occupational exposures (NNH).")
 
     if rd_scenario_choice == "custom":
-        st.sidebar.subheader("Custom 2×2 Parameters")
-        custom_study_design = st.sidebar.selectbox(
-            "Study Design Architecture:",
-            options=["rct", "prospective_cohort", "retrospective_cohort", "cross_sectional", "case_control"],
-            format_func=lambda d: {
-                "rct": "Randomized Controlled Trial (RCT)",
-                "prospective_cohort": "Prospective Cohort (Forward-looking)",
-                "retrospective_cohort": "Retrospective Cohort (Historical records)",
-                "cross_sectional": "Cross-Sectional (Prevalence snapshot)",
-                "case_control": "Case-Control (Outcome-first, Retrospective)"
-            }[d],
-            index=0
-        )
-        custom_loss_pct = st.sidebar.slider(
-            "Loss to Follow-up (%):",
-            min_value=0.0,
-            max_value=30.0,
-            value=2.5,
-            step=0.5,
-            help="Percentage of enrolled participants who dropped out or could not be assessed at completion."
-        )
-        st.sidebar.caption(
-            "📉 **What is Loss to Follow-up?** Drives Attrition Bias diagnostics: "
-            "🟢 `<5%` Pass | 🟡 `5–20%` Caution | 🔴 `>20%` Fail."
-        )
+        with st.container():
+            st.markdown("#### ⚙️ Custom 2×2 Parameters")
+            col_c1, col_c2, col_c3 = st.columns(3)
+            with col_c1:
+                custom_study_design = st.selectbox(
+                    "Study Design Architecture:",
+                    options=["rct", "prospective_cohort", "retrospective_cohort", "cross_sectional", "case_control"],
+                    format_func=lambda d: {
+                        "rct": "Randomized Controlled Trial (RCT)",
+                        "prospective_cohort": "Prospective Cohort (Forward-looking)",
+                        "retrospective_cohort": "Retrospective Cohort (Historical records)",
+                        "cross_sectional": "Cross-Sectional (Prevalence snapshot)",
+                        "case_control": "Case-Control (Outcome-first, Retrospective)"
+                    }[d],
+                    index=0,
+                    key="rd_custom_study_design"
+                )
+            with col_c2:
+                custom_loss_pct = st.slider(
+                    "Loss to Follow-up (%):",
+                    min_value=0.0,
+                    max_value=30.0,
+                    value=2.5,
+                    step=0.5,
+                    help="Percentage of enrolled participants who dropped out or could not be assessed at completion.",
+                    key="rd_custom_loss_pct"
+                )
+            with col_c3:
+                custom_favourable = st.checkbox(
+                    "Favourable Outcome / MCID",
+                    value=False,
+                    help="Check if the outcome is desirable (e.g. MCID achieved, clinical recovery, sustained abstinence) rather than an adverse event.",
+                    key="rd_custom_favourable"
+                )
 
-        col_sb1, col_sb2 = st.sidebar.columns(2)
-        with col_sb1:
-            a_val = st.number_input("Exposed / Treated Cases (a):", min_value=0, max_value=100000, value=40, step=1)
-            b_val = st.number_input("Exposed / Treated Non-Cases (b):", min_value=0, max_value=100000, value=960, step=5)
-        with col_sb2:
-            c_val = st.number_input("Unexposed / Control Cases (c):", min_value=0, max_value=100000, value=90, step=1)
-            d_val = st.number_input("Unexposed / Control Non-Cases (d):", min_value=0, max_value=100000, value=910, step=5)
+            st.caption(
+                "📉 **What is Loss to Follow-up?** Drives Attrition Bias diagnostics: "
+                "🟢 `<5%` Pass | 🟡 `5–20%` Caution | 🔴 `>20%` Fail."
+            )
+
+            col_sb1, col_sb2 = st.columns(2)
+            with col_sb1:
+                a_val = st.number_input("Exposed / Treated Cases (a):", min_value=0, max_value=100000, value=40, step=1, key="rd_a_val")
+                b_val = st.number_input("Exposed / Treated Non-Cases (b):", min_value=0, max_value=100000, value=960, step=5, key="rd_b_val")
+            with col_sb2:
+                c_val = st.number_input("Unexposed / Control Cases (c):", min_value=0, max_value=100000, value=90, step=1, key="rd_c_val")
+                d_val = st.number_input("Unexposed / Control Non-Cases (d):", min_value=0, max_value=100000, value=910, step=5, key="rd_d_val")
 
         meta = {
             "title": "Custom User-Defined Absolute Risk Investigation",
@@ -844,6 +1067,7 @@ def render_risk_difference_module(active_method_key: str, method_info: Dict[str,
             "outcome_name": "Target Health Event",
             "outcome_levels": ("Cases (Event +)", "Non-Cases (Event -)"),
             "study_design": custom_study_design,
+            "favourable_outcome": custom_favourable,
             "expected_effect": "User Defined",
             "clinical_takeaway": "Custom parameters evaluated based on user-entered contingency frequencies.",
             "scenario_key": "custom_risk_difference",
@@ -886,7 +1110,7 @@ def render_risk_difference_module(active_method_key: str, method_info: Dict[str,
             micro_list.append({"Participant_ID": f"UNEXP_{c_val+i+1:04d}", "Exposure_Group": "Unexposed", "Exposure_Binary": 0, "Outcome_Status": "Event -", "Outcome_Binary": 0, "Follow_Up_Years": 5.0, "Age": 60, "Sex": "Female"})
         df_microdata = pd.DataFrame(micro_list)
 
-        calcs = calculate_risk_difference(a_val, b_val, c_val, d_val)
+        calcs = calculate_risk_difference(a_val, b_val, c_val, d_val, favourable_outcome=custom_favourable)
         evaluations = evaluate_risk_difference_prerequisites(
             study_design=custom_study_design,
             a=a_val, b=b_val, c=c_val, d=d_val,
@@ -935,7 +1159,10 @@ def render_risk_difference_module(active_method_key: str, method_info: Dict[str,
     # 3. Visualizations & 2x2 Grid
     render_risk_difference_visualizations(calcs, meta)
 
-    # 4. Methodology Tabs
+    # 4. Service Target Sizing & Capacity Forecasting Calculator
+    render_service_target_capacity_calculator(calcs, meta)
+
+    # 5. Methodology Tabs
     st.markdown("---")
     tab_rd_rationale, tab_rd_excel, tab_rd_code, tab_rd_download = st.tabs([
         "📋 Rationale & Epidemiological Framework",

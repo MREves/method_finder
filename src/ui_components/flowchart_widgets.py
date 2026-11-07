@@ -439,13 +439,13 @@ flowchart TD
 def render_epidemiology_decision_tree() -> None:
     """Renders the comprehensive Observational Epidemiology decision tree covering
 
-    Cohort, Case-Control, Cross-Sectional, Standardization, Screening, and Meta-Analysis.
+    Cohort, Case-Control, Cross-Sectional, Standardization, Health Inequalities, Screening, and Meta-Analysis.
     """
-    st.markdown("### 🏥 Observational Epidemiology & Public Health Decision Tree (17 Methods)")
+    st.markdown("### 🏥 Observational Epidemiology & Public Health Decision Tree (18 Methods)")
     st.markdown("""
     Observational studies cannot rely on experimental randomization. This decision tree routes based on 
     **Temporal Direction** (Prospective vs Retrospective vs Cross-Sectional), **Sampling Strategy** (Exposed vs Outcome-First), 
-    and **Confounding Adjustment** to determine the valid epidemiological effect measure.
+    **Socioeconomic Gradients**, and **Confounding Adjustment** to determine the valid epidemiological effect measure.
     """)
 
     mermaid_code = """```mermaid
@@ -469,10 +469,10 @@ flowchart TD
     Cross -->|"Population Disease Burden"| Prev["Prevalence & Prevalence Odds Ratio"]
     Cross -->|"Diagnostic Swab / Rapid Test vs Gold Standard"| Diag["Diagnostic Accuracy<br/>Sens, Spec, PPV, NPV, LR+, LR-, ROC-AUC"]
 
-    %% Standardization
-    EpiStart -->|"Demographic Comparison across Regions"| Std{"Age-Specific Data Availability"}
-    Std -->|"Local Age-Specific Death Rates Known"| DSR["Direct Age-Standardized Rate (DSR)<br/>European Standard Population"]
-    Std -->|"Only Total Deaths Known in Small District"| SMR["Indirect Standardized Mortality Ratio (SMR)<br/>Expected Deaths Benchmark"]
+    %% Standardization & Health Inequalities
+    EpiStart -->|"Demographic & Socioeconomic Comparison"| PopHealth{"Analytical Task"}
+    PopHealth -->|"Age-Specific Standardization across Regions"| DSR["Direct Age-Standardized Rate (DSR) & SMR<br/>European Standard Population"]
+    PopHealth -->|"Social Gradient across Ranked IMD Strata"| Ineq["Slope Index (SII) & Relative Index (RII)<br/>Midpoint Ridits & Population-Weighted Slope"]
 
     %% Evidence Synthesis & Survival
     EpiStart -->|"Clinical Evidence Synthesis / Time-to-Event"| Synth{"Synthesis Type"}
@@ -483,13 +483,15 @@ flowchart TD
     classDef casecontrol fill:#fef2f2,stroke:#dc2626,stroke-width:2px,color:#991b1b;
     classDef screening fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#166534;
     classDef std fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#854d0e;
+    classDef ineq fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#065f46;
     classDef decision fill:#f8fafc,stroke:#475569,stroke-width:1.5px,color:#0f172a;
 
     class RR,IRR,AR cohort;
     class OR,MH,Outbreak casecontrol;
     class Prev,Diag screening;
-    class DSR,SMR,Meta,KM std;
-    class EpiStart,Cohort,CC,Cross,Std,Synth decision;
+    class DSR,Meta,KM std;
+    class Ineq ineq;
+    class EpiStart,Cohort,CC,Cross,PopHealth,Synth decision;
 ```"""
     st.markdown(mermaid_code)
 
@@ -518,6 +520,7 @@ flowchart TD
                 "Retrospective Case-Control (Cases matched to Controls)",
                 "Cross-Sectional Diagnostic Accuracy Study",
                 "Regional Demographic Rate Standardization",
+                "Socioeconomic Health Inequality Surveillance (e.g. IMD Deciles)",
                 "Systematic Review / Evidence Synthesis"
             ],
             key="epi_tree_design_select"
@@ -532,6 +535,7 @@ flowchart TD
                 "Adjust for Confounder via Mantel-Haenszel OR",
                 "Diagnostic Sensitivity, Specificity & ROC-AUC",
                 "Direct Age-Standardized Rate (DSR) with Derbyshire Map",
+                "Slope Index (SII) & Relative Index (RII) across IMD Deciles",
                 "DerSimonian-Laird Random-Effects Meta-Analysis"
             ],
             key="epi_tree_obj_select"
@@ -545,6 +549,7 @@ flowchart TD
         "Adjust for Confounder via Mantel-Haenszel OR": ("mantel_haenszel", "Mantel-Haenszel Stratified Odds Ratio"),
         "Diagnostic Sensitivity, Specificity & ROC-AUC": ("diagnostic_accuracy", "Diagnostic Accuracy (Sens/Spec/ROC)"),
         "Direct Age-Standardized Rate (DSR) with Derbyshire Map": ("standardization", "Direct Standardization (DSR & Map)"),
+        "Slope Index (SII) & Relative Index (RII) across IMD Deciles": ("health_inequalities", "Health Inequalities (SII & RII)"),
         "DerSimonian-Laird Random-Effects Meta-Analysis": ("meta_analysis", "Random-Effects Meta-Analysis")
     }
     ekey, ename = epi_routing.get(epi_objective, ("relative_risk", "Relative Risk"))

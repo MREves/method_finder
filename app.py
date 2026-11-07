@@ -109,12 +109,13 @@ with col1:
 with col2:
     st.markdown("""
     ### 🏥 Epidemiology
-    **Status:** 🟢 **Active (17 Methods)**
+    **Status:** 🟢 **Active (18 Methods)**
     
     Tailored for public health & observational studies:
     - Study designs (Cohort, Case-Control, RCT)
     - Risk & effect metrics (OR, RR, IRR, RD, NNT)
     - Rate standardization (Direct DSR & Indirect SMR)
+    - Health inequalities (Slope Index SII & Relative Index RII)
     - Outbreak analytics & Meta-Analysis (PRISMA 2020)
     - Diagnostic screening (Sensitivity, Specificity, ROC)
     

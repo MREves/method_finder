@@ -240,6 +240,25 @@ PROBLEM_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "rationale": "Handles incomplete observation times via non-informative right-censoring, providing unbiased product-limit survival estimates."
     },
 
+    "health_inequality_gradient": {
+        "id": "health_inequality_gradient",
+        "name": "Measuring Health Inequalities Across Socioeconomic Strata",
+        "summary": "Quantify absolute and relative health gradients across ranked deprivation groups (IMD deciles / quintiles).",
+        "primary_pillar": "epidemiology",
+        "primary_method_key": "health_inequalities",
+        "primary_method_name": "Slope Index (SII) & Relative Index of Inequality (RII)",
+        "parametric_type": "Population-Weighted Regression",
+        "alternative_method_key": "direct_standardization",
+        "alternative_method_name": "Direct Age-Standardized Rate (DSR)",
+        "alternative_condition": "Use when comparing geographical districts rather than ordered socioeconomic strata.",
+        "sample_size_framework": "cohort_rr",
+        "sample_size_label": "Epidemiology: Socioeconomic Gradient Coverage",
+        "sample_size_params": {"p0": 0.10, "rr": 2.00, "alpha": 0.05, "power": 0.80},
+        "page_route": "pages/2_🏥_Epidemiology_Methods.py",
+        "deep_link_session": {"epi_nav_mode": "direct", "epi_direct_method_key": "health_inequalities"},
+        "rationale": "WHO and OHID gold-standard methodology using midpoint ridits to measure both absolute gap (SII) and relative risk ratio (RII) across the entire social gradient."
+    },
+
     "rare_event_classification": {
         "id": "rare_event_classification",
         "name": "Supervised Prediction of Rare Clinical or Operational Events",

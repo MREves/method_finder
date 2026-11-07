@@ -32,6 +32,7 @@ from src.ui_components.epi_risk_stratification_widgets import render_risk_strati
 from src.ui_components.epi_mantel_haenszel_widgets import render_mantel_haenszel_module
 from src.ui_components.epi_outbreak_widgets import render_outbreak_module
 from src.ui_components.epi_meta_analysis_widgets import render_meta_analysis_module
+from src.ui_components.epi_health_inequalities_widgets import render_health_inequalities_module
 from src.ui_components.sidebar_navigation import (
     render_custom_sidebar_navigation,
     render_roundtrip_navigation_banner
@@ -60,7 +61,7 @@ if st.session_state.get("debug_mode", False) or st.session_state.get("debug_mode
     with st.expander("📌 Epidemiological Methods Implementation Tracker", expanded=False):
         st.markdown("""
         **Project Status: Phase 3 — Epidemiological Methods (In Active Implementation)**  
-        This tracker monitors the 17 core epidemiological methods across 9 thematic modules.
+        This tracker monitors the 18 core epidemiological methods across 10 thematic modules.
         """)
         st.markdown(r"""
         #### 🗺️ Module 1: Demographic Rate Standardization
@@ -103,6 +104,11 @@ if st.session_state.get("debug_mode", False) or st.session_state.get("debug_mode
         * [x] **Between-Study Heterogeneity Metrics** (Cochran's Q, Higgins & Thompson's I², DerSimonian-Laird τ²)
         * [x] **Publication Bias & Funnel Plot Asymmetry** (Egger's Linear Regression Test & Pseudo-95% Limits)
         * [x] **Leave-One-Out Sensitivity Analysis & Prediction Intervals** (Higgins 95% Future Population Interval)
+
+        #### ⚖️ Module 10: Health Inequalities & Socioeconomic Gradients
+        * [x] **Slope Index of Inequality (SII)** (Absolute Gap across Cumulative Population Relative Ranks / Midpoint Ridits)
+        * [x] **Relative Index of Inequality (RII)** (Relative Risk Ratio at Deprivation Extremes via WLS & Log-GLM)
+        * [x] **Synthetic CVD Mortality & Marmot Gradient Pedagogical Scenarios** (Population-Weighted Scatter Bubbles & Confidence Ribbons)
         """)
 
 st.markdown("---")
@@ -402,6 +408,23 @@ EPI_CATALOG = {
             "Sufficient Study Volume: Minimum K >= 3 studies for pooling and between-study variance (tau^2) estimation."
         ],
         "alternative_test": "Individual Patient Data (IPD) Meta-Analysis (when raw participant records are available) or Network Meta-Analysis (for multiple competing treatments)."
+    },
+    "health_inequalities": {
+        "name": "Health Inequalities: Slope Index (SII) & Relative Index (RII)",
+        "category": "Health Inequalities & Social Gradients",
+        "description": "Quantifies the social gradient in health across ordered socioeconomic strata (e.g. IMD deciles) weighted by population size, computing Slope Index of Inequality (SII - absolute gap) and Relative Index of Inequality (RII - relative ratio) via Weighted Least Squares (WLS) and log-linear GLM.",
+        "parametric": True,
+        "when_to_use": [
+            "Measuring the depth and steepness of the socioeconomic health gradient across all intermediate groups (not just top vs bottom).",
+            "Public health surveillance (OHID Fingertips, Marmot Reviews, NHS Core20PLUS5, WHO HEAT).",
+            "Evaluating whether health inequalities are widening or narrowing over calendar time in absolute (SII) and relative (RII) terms."
+        ],
+        "key_assumptions": [
+            "Ordered socioeconomic strata (e.g., IMD deciles, income quintiles, education levels).",
+            "Reliable population denominators for each stratum to compute cumulative relative ranks (midpoint ridits).",
+            "Linear or monotonic relationship across relative ranks (or log-linear link for rate outcomes)."
+        ],
+        "alternative_test": "Concentration Index / Gini Coefficient (for non-regression inequality ranking) or Attributable Fraction (for specific discrete risk factors)."
     }
 }
 
@@ -420,7 +443,8 @@ if not is_direct_mode:
             "stratification",
             "cmh_confounding",
             "outbreak_investigation",
-            "meta_analysis"
+            "meta_analysis",
+            "health_inequalities"
         ],
         format_func=lambda x: {
             "standardization": "🗺️ Compare disease/mortality rates across geographical regions or populations with different age profiles",
@@ -432,7 +456,8 @@ if not is_direct_mode:
             "stratification": "🗂️ Clinical Risk Stratification & Prognostic Prediction Models (Integer Point Scores, Calibration, DCA Net Benefit)",
             "cmh_confounding": "⚖️ Stratified Analysis, Confounding Control & Interaction: Stratify 2x2 tables to control confounding or detect Simpson's Paradox / Effect Modification (Cochran-Mantel-Haenszel)",
             "outbreak_investigation": "🦠 Field Outbreak Investigation: Acute food poisoning or ward outbreak (Food-Specific Attack Rates, Epi Curve, Vehicle Incrimination, Secondary Attack Rate)",
-            "meta_analysis": "📚 Systematic Review & Meta-Analysis: Synthesize evidence across multiple trials/studies (Fixed & Random Effects, I², Funnel Plot, Egger Test)"
+            "meta_analysis": "📚 Systematic Review & Meta-Analysis: Synthesize evidence across multiple trials/studies (Fixed & Random Effects, I², Funnel Plot, Egger Test)",
+            "health_inequalities": "⚖️ Measure Health Inequalities & Social Gradients across Deprivation Groups: Slope Index (SII) & Relative Index (RII)"
         }[x]
     )
 
@@ -502,6 +527,8 @@ if not is_direct_mode:
         active_method_key = "outbreak_investigation"
     elif selected_task == "meta_analysis":
         active_method_key = "meta_analysis"
+    elif selected_task == "health_inequalities":
+        active_method_key = "health_inequalities"
     else:
         active_method_key = "odds_ratio"
 
@@ -568,6 +595,7 @@ is_risk_stratification = (active_method_key == "risk_stratification")
 is_mantel_haenszel = (active_method_key == "mantel_haenszel")
 is_outbreak_investigation = (active_method_key == "outbreak_investigation")
 is_meta_analysis = (active_method_key == "meta_analysis")
+is_health_inequalities = (active_method_key == "health_inequalities")
 
 if is_standardization:
     render_rate_standardization_module(active_method_key, method_info)
@@ -599,6 +627,8 @@ elif is_outbreak_investigation:
     render_outbreak_module(active_method_key, method_info)
 elif is_meta_analysis:
     render_meta_analysis_module(active_method_key, method_info)
+elif is_health_inequalities:
+    render_health_inequalities_module(active_method_key, method_info)
 else:
     st.info("""
     ### ⏳ Next Epidemiological Method

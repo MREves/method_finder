@@ -91,6 +91,9 @@ def route_universal_method_recommendation(
     elif analytical_goal == "dimension_reduction":
         inferred_key = "dimension_reduction_pca"
 
+    elif analytical_goal == "health_inequality_gradient":
+        inferred_key = "health_inequality_gradient"
+
     else:
         inferred_key = problem_key if (problem_key and problem_key in PROBLEM_DEFINITIONS) else "two_group_comparison"
 

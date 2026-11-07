@@ -131,7 +131,8 @@ def render_problem_definition_form(active_blueprint: Optional[Dict[str, Any]] = 
         "predict_rare_event": "🔮 Predict Individual Binary High-Risk Events (Rare Clinical Event / Failure / Churn)",
         "equity_fairness": "⚖️ Audit Algorithmic Disparate Impact & Fairness (Four-Fifths 80% Rule)",
         "clustering_phenotyping": "🔍 Discover Unlabelled Patient Phenotypes or Customer Clusters",
-        "dimension_reduction": "📉 Compress High-Dimensional Multicollinear Predictors (PCA)"
+        "dimension_reduction": "📉 Compress High-Dimensional Multicollinear Predictors (PCA)",
+        "health_inequality_gradient": "⚖️ Measure Health Inequalities across Deprivation Strata (SII & RII)"
     }
 
     prob_to_goal = {
@@ -149,6 +150,7 @@ def render_problem_definition_form(active_blueprint: Optional[Dict[str, Any]] = 
         "algorithmic_fairness_audit": "equity_fairness",
         "unsupervised_phenotyping": "clustering_phenotyping",
         "dimension_reduction_pca": "dimension_reduction",
+        "health_inequality_gradient": "health_inequality_gradient",
     }
 
     design_options = {
