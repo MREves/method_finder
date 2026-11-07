@@ -53,12 +53,12 @@ def render_custom_sidebar_navigation(current_page: str = ""):
         icon="🏠"
     )
     st.sidebar.page_link(
-        "pages/7_🎯_Study_Design_and_Method_Selector.py",
+        "pages/8_🎯_Study_Design_and_Method_Selector.py",
         label="Study Design & Selector",
         icon="🎯"
     )
     st.sidebar.page_link(
-        "pages/8_🗺️_Decision_Flowcharts.py",
+        "pages/9_🗺️_Decision_Flowcharts.py",
         label="Decision Trees & Flowcharts",
         icon="🗺️"
     )
@@ -132,7 +132,8 @@ def render_custom_sidebar_navigation(current_page: str = ""):
         "🤖 3. Machine Learning & AI": "pages/3_🤖_Machine_Learning.py",
         "📐 4. Sample Size & Power": "pages/4_📐_Sample_Size_and_Power.py",
         "📋 5. Survey & Questionnaire Analysis": "pages/5_📋_Survey_and_Questionnaire_Analysis.py",
-        "🗣️ 6. Natural Language Processing": "pages/6_🗣️_Natural_Language_Processing.py"
+        "🗣️ 6. Natural Language Processing": "pages/6_🗣️_Natural_Language_Processing.py",
+        "⏱️ 7. Time Series & Forecasting": "pages/7_⏱️_Time_Series_and_Forecasting.py"
     }
 
     # Clean key for selectbox to avoid conflicts across page reruns
@@ -181,13 +182,18 @@ def render_custom_sidebar_navigation(current_page: str = ""):
         label="6. Natural Language Processing",
         icon="🗣️"
     )
+    st.sidebar.page_link(
+        "pages/7_⏱️_Time_Series_and_Forecasting.py",
+        label="7. Time Series & Forecasting",
+        icon="⏱️"
+    )
 
     st.sidebar.markdown("---")
 
 
 def render_roundtrip_navigation_banner():
     """Renders a non-intrusive contextual breadcrumb banner at the top of educational training pages
-    when navigated from the Study Design & Method Selector (Page 7).
+    when navigated from the Study Design & Method Selector (Page 8).
     """
     consultation = st.session_state.get("selector_consultation") if hasattr(st, "session_state") else None
     if not isinstance(consultation, dict) or not consultation.get("active"):
@@ -201,7 +207,7 @@ def render_roundtrip_navigation_banner():
     domain_text = f" • <strong>Domain:</strong> {domain_name}" if domain_name else ""
     source_title = consultation.get("source_title", "Study Design Selector")
     source_icon = consultation.get("source_icon", "🎯")
-    return_page = consultation.get("return_page", "pages/7_🎯_Study_Design_and_Method_Selector.py")
+    return_page = consultation.get("return_page", "pages/8_🎯_Study_Design_and_Method_Selector.py")
     return_label = consultation.get("return_label", "← Return to Selector")
     sub_text = consultation.get("sub_text", "Method pre-selected based on research objective & data architecture")
 

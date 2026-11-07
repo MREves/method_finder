@@ -150,9 +150,9 @@ c_h1, c_h2, c_h3, c_h4, c_h5, c_h6, c_h7, c_h8 = st.columns(8)
 with c_h1:
     st.page_link("app.py", label="Home Overview Hub", icon="🏠")
 with c_h2:
-    st.page_link("pages/7_🎯_Study_Design_and_Method_Selector.py", label="Method Selector", icon="🎯")
+    st.page_link("pages/8_🎯_Study_Design_and_Method_Selector.py", label="Method Selector", icon="🎯")
 with c_h3:
-    st.page_link("pages/8_🗺️_Decision_Flowcharts.py", label="Decision Flowcharts", icon="🗺️")
+    st.page_link("pages/9_🗺️_Decision_Flowcharts.py", label="Decision Flowcharts", icon="🗺️")
 with c_h4:
     st.page_link("pages/1_📊_Statistical_Tests.py", label="Statistical Tests", icon="📊")
 with c_h5:

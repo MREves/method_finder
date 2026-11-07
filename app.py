@@ -14,6 +14,21 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from src.stats_calcs.decision_schema import STATISTICAL_TESTS
 from src.ui_components.sidebar_navigation import render_custom_sidebar_navigation
 
+EPI_QUICK_METHODS = {
+    "risk_stratification": "Clinical Risk Stratification (TRIPOD, DCA, Points)",
+    "risk_difference": "Risk Difference (RD) & NNT / NNH",
+    "health_inequalities": "Health Inequalities (Slope Index SII & RII)",
+    "relative_risk": "Relative Risk / Risk Ratio (RR)",
+    "odds_ratio": "Odds Ratio (OR in Case-Control)",
+    "direct_standardization": "Direct Age-Standardized Rate (DSR & Map)",
+    "indirect_standardization": "Indirect Standardization & SMR",
+    "kaplan_meier": "Kaplan-Meier Survival Analysis",
+    "cox_regression": "Cox Proportional Hazards Regression",
+    "diagnostic_accuracy": "Diagnostic Accuracy (Sens / Spec / ROC)",
+    "meta_analysis": "Random-Effects Meta-Analysis (PRISMA)",
+    "outbreak_investigation": "Outbreak Investigation & Attack Rates"
+}
+
 st.set_page_config(
     page_title="Method Finder",
     page_icon="🧭",
@@ -71,9 +86,9 @@ col_hub1, col_hub2, col_hub3 = st.columns(3)
 with col_hub1:
     st.page_link("pages/0_📚_Statistical_Fundamentals.py", label="Statistical Fundamentals & Baseline Concepts 📚", icon="📚")
 with col_hub2:
-    st.page_link("pages/7_🎯_Study_Design_and_Method_Selector.py", label="Universal Study Design Selector 🎯", icon="🎯")
+    st.page_link("pages/8_🎯_Study_Design_and_Method_Selector.py", label="Universal Study Design Selector 🎯", icon="🎯")
 with col_hub3:
-    st.page_link("pages/8_🗺️_Decision_Flowcharts.py", label="Methodology Decision Flowcharts 🗺️", icon="🗺️")
+    st.page_link("pages/9_🗺️_Decision_Flowcharts.py", label="Methodology Decision Flowcharts 🗺️", icon="🗺️")
 
 st.markdown("---")
 
@@ -114,6 +129,7 @@ with col2:
     Tailored for public health & observational studies:
     - Study designs (Cohort, Case-Control, RCT)
     - Risk & effect metrics (OR, RR, IRR, RD, NNT)
+    - Clinical risk stratification (Framingham/QRISK points, TRIPOD, DCA)
     - Rate standardization (Direct DSR & Indirect SMR)
     - Health inequalities (Slope Index SII & Relative Index RII)
     - Outbreak analytics & Meta-Analysis (PRISMA 2020)
@@ -122,6 +138,18 @@ with col2:
     *Full 4-tab architecture with DerSimonian-Laird & GIS maps.*
     """)
     st.page_link("pages/2_🏥_Epidemiology_Methods.py", label="Open Epidemiology Methods 👉", icon="🏥")
+
+    with st.expander("⚡ Quick Jump to Method", expanded=False):
+        selected_epi_quick = st.selectbox(
+            "Select method to explore directly:",
+            options=list(EPI_QUICK_METHODS.keys()),
+            format_func=lambda k: EPI_QUICK_METHODS[k],
+            key="home_quick_epi_select"
+        )
+        if st.button("Explore This Method 👉", key="btn_quick_epi_explore"):
+            st.session_state["epi_nav_mode"] = "direct"
+            st.session_state["epi_direct_method_key"] = selected_epi_quick
+            st.switch_page("pages/2_🏥_Epidemiology_Methods.py")
 
 with col3:
     st.markdown("""
@@ -155,7 +183,7 @@ with col4:
 
 st.markdown("---")
 
-col_row2_1, col_row2_2 = st.columns(2)
+col_row2_1, col_row2_2, col_row2_3 = st.columns(3)
 
 with col_row2_1:
     st.markdown("""
@@ -163,27 +191,41 @@ with col_row2_1:
     **Status:** 🟢 **Active (7 Methods)**
     
     Psychometrics, scale reliability & representative survey sampling:
-    - **Scale Analysis:** Likert scale analysis, Ordinal vs. Interval controversy, Diverging 100% stacked bar charts
-    - **Scale Reliability:** Cronbach's Alpha (α), Alpha-if-Item-Deleted purification table, McDonald's Omega (ω)
-    - **Inter-Rater Concordance:** Cohen's Kappa (κ), Quadratic Weighted Kappa (κw), Fleiss' Kappa
-    - **Construct Validity:** Exploratory Factor Analysis (EFA), Cattell's Scree Plot, KMO sampling adequacy
-    - **Sampling & Weighting:** Finite Population Correction (FPC) sizing & Post-stratification cell weighting with Kish's Effective Sample Size (Neff)
+    - **Scale Analysis:** Likert scale analysis, Diverging 100% stacked bar charts
+    - **Scale Reliability:** Cronbach's Alpha (α), Item-Deleted purification, McDonald's Omega (ω)
+    - **Inter-Rater Concordance:** Cohen's Kappa (κ), Quadratic Weighted Kappa, Fleiss' Kappa
+    - **Construct Validity:** Exploratory Factor Analysis (EFA), Cattell's Scree, KMO test
+    - **Sampling & Weighting:** FPC sizing & Post-stratification cell weighting with Kish's Neff
     """)
     st.page_link("pages/5_📋_Survey_and_Questionnaire_Analysis.py", label="Open Survey & Questionnaire Analysis 📋", icon="📋")
 
 with col_row2_2:
     st.markdown("""
-    ### 🗣️ Natural Language Processing (Classical to LLMs)
+    ### 🗣️ Natural Language Processing
     **Status:** 🟢 **Active (7 Methods)**
     
     Clinical text, incident reports (Datix) & patient comments:
-    - **Level 1:** Classical & Rule-Based NLP (tokenization, regex entity extraction, VADER sentiment & clinical NegEx)
-    - **Level 2:** Statistical Vectorization (TF-IDF term weighting, Naive Bayes & Linear SVM text classifiers)
-    - **Level 3:** Unsupervised Topic Modelling (Latent Dirichlet Allocation, thematic discovery, coherence $C_v$)
-    - **Level 4:** Dense Semantic Embeddings (384-dim vector representations, cosine similarity, semantic KNN)
-    - **Level 5:** State-of-the-Art Generative AI & LLMs (Clinical NER, Zero-Shot, RAG hallucination audit)
+    - **Rule-Based NLP:** VADER sentiment valence & clinical NegEx negation scope
+    - **Vectorization:** TF-IDF keyword extraction, Naive Bayes & Linear SVM classifiers
+    - **Topic Modelling:** Latent Dirichlet Allocation (LDA) thematic discovery
+    - **Dense Embeddings:** 384-dim semantic vectors, cosine similarity & KNN
+    - **Generative AI & LLMs:** Clinical NER, Zero-Shot classification & RAG audits
     """)
     st.page_link("pages/6_🗣️_Natural_Language_Processing.py", label="Open Natural Language Processing 🗣️", icon="🗣️")
+
+with col_row2_3:
+    st.markdown("""
+    ### ⏱️ Time Series & Forecasting
+    **Status:** 🟢 **Active (8 Models & 7 Metrics)**
+    
+    Sequential temporal modeling, decomposition & evaluation metrics:
+    - **Anatomy & Diagnostics:** Additive/Multiplicative decomposition, ACF, PACF, ADF test
+    - **Model Hierarchy:** Naive, Seasonal Naive, Drift, SES, Holt's Damped, Holt-Winters, Lagged ML, Croston
+    - **Evaluation Metrics Deep Dive:** MAE, MSE, RMSE, MAPE (zero division risks), sMAPE, MASE, MDA
+    - **Metric Decision Matrix:** When to pick which metric over another based on operational costs
+    - **Temporal Validation:** Rolling-Origin (Expanding-Window) CV preventing lookahead leakage
+    """)
+    st.page_link("pages/7_⏱️_Time_Series_and_Forecasting.py", label="Open Time Series & Forecasting ⏱️", icon="⏱️")
 
 st.markdown("---")
 

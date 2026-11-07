@@ -37,7 +37,7 @@ st.set_page_config(
 )
 
 # Render Custom Grouped Sidebar Navigation
-render_custom_sidebar_navigation("pages/8_🗺️_Decision_Flowcharts.py")
+render_custom_sidebar_navigation("pages/9_🗺️_Decision_Flowcharts.py")
 
 # Render contextual breadcrumb if navigated from Selector
 render_roundtrip_navigation_banner()

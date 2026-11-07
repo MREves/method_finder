@@ -40,7 +40,7 @@ st.set_page_config(
 )
 
 # Render Custom Grouped Sidebar Navigation
-render_custom_sidebar_navigation("pages/7_🎯_Study_Design_and_Method_Selector.py")
+render_custom_sidebar_navigation("pages/8_🎯_Study_Design_and_Method_Selector.py")
 
 st.title("🎯 Universal Study Design & Method Selector")
 st.markdown("""

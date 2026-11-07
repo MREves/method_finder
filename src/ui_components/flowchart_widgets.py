@@ -119,7 +119,7 @@ flowchart TD
                     <tr style="border-bottom: 1px solid #e2e8f0; background-color: #ffffff;">
                         <td style="padding: 0.6rem 0.85rem; font-weight: 600; color: #334155;">Key Output Metrics</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">$t$-stat, $F$-ratio, $p$-value, Cohen's $d$, 95% Confidence Intervals</td>
-                        <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Relative Risk (RR), Odds Ratio (OR), DSR, Sensitivity/Specificity, NNT</td>
+                        <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Relative Risk (RR), Odds Ratio (OR), DSR, Bedside Risk Scores (Sullivan Points), Sensitivity/Specificity, NNT</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">PR-AUC, ROC-AUC, Brier Score, Silhouette, Davies-Bouldin, Calinski-Harabasz</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Total Required $N$, Per-Group $n$, Power Curves, Attrition Cushion ($N / (1-L)$)</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Sentiment valence, TF-IDF weights, Topic coherence ($C_v$ / NPMI), Cosine similarity, Entity span F1, Faithfulness ratio</td>
@@ -127,7 +127,7 @@ flowchart TD
                     <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
                         <td style="padding: 0.6rem 0.85rem; font-weight: 600; color: #334155;">Primary Governance</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">CONSORT 2010, ICH-E9, APA Guidelines</td>
-                        <td style="padding: 0.6rem 0.85rem; color: #1f2937;">STROBE Guidelines, PRISMA 2020, STARD</td>
+                        <td style="padding: 0.6rem 0.85rem; color: #1f2937;">STROBE Guidelines, PRISMA 2020, STARD, TRIPOD (Prognosis)</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">TRIPOD-AI, NHS AI Ethics, Four-Fifths 80% Rule</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">NIHR, MRC, FDA Statistical Guidance, SPIRIT</td>
                         <td style="padding: 0.6rem 0.85rem; color: #1f2937;">Caldicott Principles, HIPAA de-identification, STROBE qualitative criteria, RAGAS Hallucination auditing</td>
@@ -150,6 +150,7 @@ flowchart TD
                 "Confirm hypothesis / compare clinical groups",
                 "Measure observational disease risk / exposure",
                 "Evaluate a screening swab or diagnostic test",
+                "Develop clinical risk score / bedside stratification (TRIPOD)",
                 "Predict rare clinical event (e.g. ICU Sepsis)",
                 "Forecast sequential time series demand",
                 "Discover unknown sub-phenotypes / patient clusters",
@@ -233,12 +234,27 @@ flowchart TD
         resolved_bg = "#eff6ff"
         resolved_border = "#2563eb"
         resolved_rationale = "Validating index test performance against a verified gold standard reference."
-    elif "Predict rare clinical event" in triage_goal or "Forecast sequential" in triage_goal:
+    elif "clinical risk score" in triage_goal.lower() or "risk stratification" in triage_goal.lower():
+        resolved_pillar = "Observational Epidemiology"
+        resolved_method = "Clinical Risk Stratification & Prognostic Models (Sullivan Points, Calibration, DCA)"
+        resolved_page = "pages/2_🏥_Epidemiology_Methods.py"
+        resolved_icon = "🗂️"
+        resolved_color = "#1e40af"
+        resolved_bg = "#eff6ff"
+        resolved_border = "#2563eb"
+        resolved_rationale = "Formulating bedside integer point scores, assessing calibration & discrimination (TRIPOD), and evaluating clinical Net Benefit via Decision Curve Analysis."
+    elif "Forecast sequential" in triage_goal:
+        resolved_pillar = "Time Series & Operational Forecasting"
+        resolved_method = "Time Series Analysis, Decomposition & Forecasting Models"
+        resolved_page = "pages/7_⏱️_Time_Series_and_Forecasting.py"
+        resolved_icon = "⏱️"
+        resolved_color = "#0369a1"
+        resolved_bg = "#f0f9ff"
+        resolved_border = "#0ea5e9"
+        resolved_rationale = "Analyzing sequential temporal dependencies, classical trend/seasonal decomposition, and evaluating models with rolling-origin temporal validation."
+    elif "Predict rare clinical event" in triage_goal:
         resolved_pillar = "Machine Learning & AI"
-        if "Forecast" in triage_goal:
-            resolved_method = "Lagged Ensemble Time Series Forecaster"
-        else:
-            resolved_method = "Cost-Sensitive Random Forest (PR-AUC / Brier Score)"
+        resolved_method = "Cost-Sensitive Random Forest (PR-AUC / Brier Score)"
         resolved_page = "pages/3_🤖_Machine_Learning.py"
         resolved_icon = "🤖"
         resolved_color = "#6b21a8"
@@ -299,6 +315,9 @@ flowchart TD
     col_btn, _ = st.columns([1.5, 2.5])
     with col_btn:
         if st.button(f"Open {resolved_pillar} Module 👉", key="btn_triage_jump", use_container_width=True):
+            if "clinical risk stratification" in resolved_method.lower():
+                st.session_state["epi_nav_mode"] = "direct"
+                st.session_state["epi_direct_method_key"] = "risk_stratification"
             st.switch_page(resolved_page)
 
 
@@ -469,6 +488,10 @@ flowchart TD
     Cross -->|"Population Disease Burden"| Prev["Prevalence & Prevalence Odds Ratio"]
     Cross -->|"Diagnostic Swab / Rapid Test vs Gold Standard"| Diag["Diagnostic Accuracy<br/>Sens, Spec, PPV, NPV, LR+, LR-, ROC-AUC"]
 
+    %% Clinical Prognosis & Risk Stratification
+    EpiStart -->|"Clinical Prognosis & Risk Stratification"| Prog{"Model Purpose"}
+    Prog -->|"Bedside Points & Stratification (TRIPOD)"| Strat["Clinical Risk Stratification<br/>Sullivan Points, Calibration & DCA"]
+
     %% Standardization & Health Inequalities
     EpiStart -->|"Demographic & Socioeconomic Comparison"| PopHealth{"Analytical Task"}
     PopHealth -->|"Age-Specific Standardization across Regions"| DSR["Direct Age-Standardized Rate (DSR) & SMR<br/>European Standard Population"]
@@ -482,6 +505,7 @@ flowchart TD
     classDef cohort fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af;
     classDef casecontrol fill:#fef2f2,stroke:#dc2626,stroke-width:2px,color:#991b1b;
     classDef screening fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#166534;
+    classDef riskstrat fill:#fdf4ff,stroke:#c026d3,stroke-width:2px,color:#86198f;
     classDef std fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#854d0e;
     classDef ineq fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#065f46;
     classDef decision fill:#f8fafc,stroke:#475569,stroke-width:1.5px,color:#0f172a;
@@ -489,9 +513,10 @@ flowchart TD
     class RR,IRR,AR cohort;
     class OR,MH,Outbreak casecontrol;
     class Prev,Diag screening;
+    class Strat riskstrat;
     class DSR,Meta,KM std;
     class Ineq ineq;
-    class EpiStart,Cohort,CC,Cross,PopHealth,Synth decision;
+    class EpiStart,Cohort,CC,Cross,Prog,PopHealth,Synth decision;
 ```"""
     st.markdown(mermaid_code)
 
@@ -519,6 +544,7 @@ flowchart TD
                 "Prospective Cohort (Exposed vs Unexposed followed over time)",
                 "Retrospective Case-Control (Cases matched to Controls)",
                 "Cross-Sectional Diagnostic Accuracy Study",
+                "Clinical Prognosis & Risk Stratification (TRIPOD Standards)",
                 "Regional Demographic Rate Standardization",
                 "Socioeconomic Health Inequality Surveillance (e.g. IMD Deciles)",
                 "Systematic Review / Evidence Synthesis"
@@ -534,6 +560,7 @@ flowchart TD
                 "Compute Odds Ratio with Rare Disease Check",
                 "Adjust for Confounder via Mantel-Haenszel OR",
                 "Diagnostic Sensitivity, Specificity & ROC-AUC",
+                "Formulate Clinical Risk Score & Tiers (Sullivan Points, Calibration, DCA)",
                 "Direct Age-Standardized Rate (DSR) with Derbyshire Map",
                 "Slope Index (SII) & Relative Index (RII) across IMD Deciles",
                 "DerSimonian-Laird Random-Effects Meta-Analysis"
@@ -548,6 +575,7 @@ flowchart TD
         "Compute Odds Ratio with Rare Disease Check": ("odds_ratio", "Odds Ratio (Case-Control)"),
         "Adjust for Confounder via Mantel-Haenszel OR": ("mantel_haenszel", "Mantel-Haenszel Stratified Odds Ratio"),
         "Diagnostic Sensitivity, Specificity & ROC-AUC": ("diagnostic_accuracy", "Diagnostic Accuracy (Sens/Spec/ROC)"),
+        "Formulate Clinical Risk Score & Tiers (Sullivan Points, Calibration, DCA)": ("risk_stratification", "Clinical Risk Stratification & Prognostic Models"),
         "Direct Age-Standardized Rate (DSR) with Derbyshire Map": ("standardization", "Direct Standardization (DSR & Map)"),
         "Slope Index (SII) & Relative Index (RII) across IMD Deciles": ("health_inequalities", "Health Inequalities (SII & RII)"),
         "DerSimonian-Laird Random-Effects Meta-Analysis": ("meta_analysis", "Random-Effects Meta-Analysis")
@@ -647,6 +675,7 @@ flowchart TD
                 "Predict continuous clinical or operational target (Regression)",
                 "Predict rare binary event with severe imbalance (< 10%)",
                 "Predict standard binary event (Balanced ~50%)",
+                "Bedside integer score / Clinical risk stratification (TRIPOD)",
                 "Audit demographic fairness and disparate impact",
                 "Forecast chronological sequential time series demand",
                 "Discover latent patient clusters / sub-phenotypes (Unsupervised)"
@@ -671,6 +700,7 @@ flowchart TD
         "Predict continuous clinical or operational target (Regression)": ("elastic_net_regression", "Elastic Net Regularized Regression"),
         "Predict rare binary event with severe imbalance (< 10%)": ("cost_sensitive_rf", "Cost-Sensitive Random Forest (PR-AUC)"),
         "Predict standard binary event (Balanced ~50%)": ("logistic_regression", "Binary Logistic Regression (Calibrated Probabilities)"),
+        "Bedside integer score / Clinical risk stratification (TRIPOD)": ("risk_stratification", "Clinical Risk Stratification (Bedside Sullivan Points)"),
         "Audit demographic fairness and disparate impact": ("fairness_audit", "Algorithmic Fairness & 80% Disparate Impact Audit"),
         "Forecast chronological sequential time series demand": ("time_series_forecaster", "Lagged Ensemble Time Series Forecaster"),
         "Discover latent patient clusters / sub-phenotypes (Unsupervised)": ("kmeans_clustering", "K-Means Clustering with 3-Metric Validation")
@@ -680,9 +710,17 @@ flowchart TD
     st.success(f"🎯 **Recommended Architecture:** `{mname}`")
     col_jump, _ = st.columns([1.5, 2.5])
     with col_jump:
-        if st.button(f"Launch {mname} on Page 3 👉", key=f"btn_jump_ml_{mkey}", use_container_width=True):
-            st.session_state["ml_direct_model_key"] = mkey
-            st.switch_page("pages/3_🤖_Machine_Learning.py")
+        dest_label = "Page 7 👉" if mkey == "time_series_forecaster" else ("Page 2 👉" if mkey == "risk_stratification" else "Page 3 👉")
+        if st.button(f"Launch {mname} on {dest_label}", key=f"btn_jump_ml_{mkey}", use_container_width=True):
+            if mkey == "time_series_forecaster":
+                st.switch_page("pages/7_⏱️_Time_Series_and_Forecasting.py")
+            elif mkey == "risk_stratification":
+                st.session_state["epi_nav_mode"] = "direct"
+                st.session_state["epi_direct_method_key"] = "risk_stratification"
+                st.switch_page("pages/2_🏥_Epidemiology_Methods.py")
+            else:
+                st.session_state["ml_direct_model_key"] = mkey
+                st.switch_page("pages/3_🤖_Machine_Learning.py")
 
 
 # =====================================================================

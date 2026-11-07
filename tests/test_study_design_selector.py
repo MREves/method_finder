@@ -15,6 +15,13 @@ import os
 import sys
 import ast
 import unittest
+from unittest.mock import MagicMock
+
+# Mock streamlit before importing UI widgets if not in environment
+if "streamlit" not in sys.modules:
+    mock_st = MagicMock()
+    mock_st.session_state = {}
+    sys.modules["streamlit"] = mock_st
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
@@ -307,7 +314,7 @@ class TestExpanderASTCompliance(unittest.TestCase):
     """Enforces 100% compliance with st.expander(expanded=False) across all selector code."""
 
     def test_selector_page_expanders_are_collapsed(self):
-        selector_page_path = os.path.join(PROJECT_ROOT, "pages", "7_🎯_Study_Design_and_Method_Selector.py")
+        selector_page_path = os.path.join(PROJECT_ROOT, "pages", "8_🎯_Study_Design_and_Method_Selector.py")
         with open(selector_page_path, "r", encoding="utf-8") as f:
             tree = ast.parse(f.read(), filename=selector_page_path)
 
@@ -377,8 +384,10 @@ class TestSidebarNavigation(unittest.TestCase):
             os.path.join(PROJECT_ROOT, "pages", "3_🤖_Machine_Learning.py"),
             os.path.join(PROJECT_ROOT, "pages", "4_📐_Sample_Size_and_Power.py"),
             os.path.join(PROJECT_ROOT, "pages", "5_📋_Survey_and_Questionnaire_Analysis.py"),
-            os.path.join(PROJECT_ROOT, "pages", "7_🎯_Study_Design_and_Method_Selector.py"),
-            os.path.join(PROJECT_ROOT, "pages", "8_🗺️_Decision_Flowcharts.py"),
+            os.path.join(PROJECT_ROOT, "pages", "6_🗣️_Natural_Language_Processing.py"),
+            os.path.join(PROJECT_ROOT, "pages", "7_⏱️_Time_Series_and_Forecasting.py"),
+            os.path.join(PROJECT_ROOT, "pages", "8_🎯_Study_Design_and_Method_Selector.py"),
+            os.path.join(PROJECT_ROOT, "pages", "9_🗺️_Decision_Flowcharts.py"),
         ]
         for p in all_pages:
             self.assertTrue(os.path.isfile(p), f"Page file does not exist: {p}")

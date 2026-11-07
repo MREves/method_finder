@@ -94,6 +94,9 @@ def route_universal_method_recommendation(
     elif analytical_goal == "health_inequality_gradient":
         inferred_key = "health_inequality_gradient"
 
+    elif analytical_goal in ("clinical_risk_stratification", "risk_stratification", "prognostic_scoring"):
+        inferred_key = "clinical_risk_stratification"
+
     else:
         inferred_key = problem_key if (problem_key and problem_key in PROBLEM_DEFINITIONS) else "two_group_comparison"
 

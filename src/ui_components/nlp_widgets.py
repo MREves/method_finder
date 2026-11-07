@@ -163,18 +163,47 @@ def render_sentiment_negex_playground(meta: Dict[str, Any]) -> None:
         "Routine account renewal completed; client without any complaints or billing discrepancies."
     ]
     
+    def _sync_sent_sample():
+        st.session_state["sent_custom_input"] = st.session_state["sent_sample_select"]
+        st.session_state["last_sent_sample"] = st.session_state["sent_sample_select"]
+
+    if "last_sent_sample" not in st.session_state:
+        st.session_state["last_sent_sample"] = sample_texts[0]
+        st.session_state["sent_custom_input"] = sample_texts[0]
+
     col_ctrl1, col_ctrl2 = st.columns([3, 1])
     with col_ctrl1:
-        selected_sample = st.selectbox(
+        st.selectbox(
             "Select Customer / User Feedback Sample:",
             options=sample_texts,
             index=0,
-            key="sent_sample_select"
+            key="sent_sample_select",
+            on_change=_sync_sent_sample
         )
     with col_ctrl2:
         seed_val = st.number_input("Random Seed:", value=42, step=1, key="sent_seed")
-        
-    custom_text = st.text_input("Or Enter Custom User Review / Feedback Text:", value=selected_sample, key="sent_custom_input")
+
+    # Fallback sync check if sample changed outside callback
+    if "sent_sample_select" in st.session_state and st.session_state.get("last_sent_sample") != st.session_state["sent_sample_select"]:
+        st.session_state["sent_custom_input"] = st.session_state["sent_sample_select"]
+        st.session_state["last_sent_sample"] = st.session_state["sent_sample_select"]
+
+    col_txt, col_rst = st.columns([4, 1])
+    with col_txt:
+        custom_text = st.text_input(
+            "Or Enter Custom User Review / Feedback Text:",
+            key="sent_custom_input"
+        )
+    with col_rst:
+        st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+        if st.button("↩️ Reset to Sample", key="btn_reset_sent", help="Reload the selected dropdown sample into the text input."):
+            st.session_state["sent_custom_input"] = st.session_state.get("sent_sample_select", sample_texts[0])
+            st.session_state["last_sent_sample"] = st.session_state.get("sent_sample_select", sample_texts[0])
+            st.rerun()
+
+    if not custom_text or not custom_text.strip():
+        custom_text = sample_texts[0]
+
     res = calculate_sentiment_negex(custom_text)
     
     # 2x2 Metric Layout with responsive text wrapping
@@ -293,6 +322,16 @@ def render_naive_bayes_svm_playground(meta: Dict[str, Any]) -> None:
         df_data["Incident_Description"].tolist(),
         df_data["Severity_Tier"].tolist()
     )
+
+    # Highlight classification for the selected ticket
+    incident_list = df_data["Incident_Description"].tolist()
+    if selected_incident in incident_list:
+        sel_idx = incident_list.index(selected_incident)
+        pred_label = res["predictions_table"].iloc[sel_idx]["Predicted_Class"]
+        true_label = res["predictions_table"].iloc[sel_idx]["True_Class"]
+        conf_str = res["predictions_table"].iloc[sel_idx]["Confidence"]
+        is_corr = res["predictions_table"].iloc[sel_idx]["Correct"]
+        st.info(f"🎯 **Triage Classification for Selected Ticket:** Predicted Severity: **{pred_label}** (Confidence: {conf_str}) | Ground Truth: *{true_label}* ({is_corr})")
     
     m1, m2 = st.columns(2)
     with m1:
@@ -449,13 +488,47 @@ def render_clinical_ner_playground(meta: Dict[str, Any]) -> None:
         "BetaLabs renewed 5 server appliances with 128GB RAM costing $15,000; reported memory leak defect in storage tier."
     ]
     
+    def _sync_ner_sample():
+        st.session_state["ner_custom_input"] = st.session_state["ner_sample_select"]
+        st.session_state["last_ner_sample"] = st.session_state["ner_sample_select"]
+
+    if "last_ner_sample" not in st.session_state:
+        st.session_state["last_ner_sample"] = sample_notes[0]
+        st.session_state["ner_custom_input"] = sample_notes[0]
+
     col_ctrl1, col_ctrl2 = st.columns([3, 1])
     with col_ctrl1:
-        selected_note = st.selectbox("Select Enterprise Ticket / Invoice Sample:", options=sample_notes, index=0, key="ner_sample_select")
+        st.selectbox(
+            "Select Enterprise Ticket / Invoice Sample:",
+            options=sample_notes,
+            index=0,
+            key="ner_sample_select",
+            on_change=_sync_ner_sample
+        )
     with col_ctrl2:
         seed_val = st.number_input("Random Seed:", value=42, step=1, key="ner_seed")
-        
-    custom_note = st.text_input("Or Enter Custom Enterprise Narrative:", value=selected_note, key="ner_custom_input")
+
+    # Fallback sync check if sample changed outside callback
+    if "ner_sample_select" in st.session_state and st.session_state.get("last_ner_sample") != st.session_state["ner_sample_select"]:
+        st.session_state["ner_custom_input"] = st.session_state["ner_sample_select"]
+        st.session_state["last_ner_sample"] = st.session_state["ner_sample_select"]
+
+    col_txt, col_rst = st.columns([4, 1])
+    with col_txt:
+        custom_note = st.text_input(
+            "Or Enter Custom Enterprise Narrative:",
+            key="ner_custom_input"
+        )
+    with col_rst:
+        st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+        if st.button("↩️ Reset to Sample", key="btn_reset_ner", help="Reload the selected dropdown sample into the text input."):
+            st.session_state["ner_custom_input"] = st.session_state.get("ner_sample_select", sample_notes[0])
+            st.session_state["last_ner_sample"] = st.session_state.get("ner_sample_select", sample_notes[0])
+            st.rerun()
+
+    if not custom_note or not custom_note.strip():
+        custom_note = sample_notes[0]
+
     res = calculate_clinical_ner(custom_note)
     
     m1, m2 = st.columns(2)

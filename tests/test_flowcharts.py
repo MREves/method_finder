@@ -117,7 +117,7 @@ class TestFlowchartASTCompliance(unittest.TestCase):
     def test_flowchart_files_expander_compliance(self):
         """Verifies every st.expander in flowchart files has expanded=False."""
         files_to_check = [
-            os.path.join(PROJECT_ROOT, "pages", "8_🗺️_Decision_Flowcharts.py"),
+            os.path.join(PROJECT_ROOT, "pages", "9_🗺️_Decision_Flowcharts.py"),
             os.path.join(PROJECT_ROOT, "src", "ui_components", "flowchart_widgets.py")
         ]
 
@@ -161,8 +161,9 @@ class TestFlowchartASTCompliance(unittest.TestCase):
             "pages/4_📐_Sample_Size_and_Power.py",
             "pages/5_📋_Survey_and_Questionnaire_Analysis.py",
             "pages/6_🗣️_Natural_Language_Processing.py",
-            "pages/7_🎯_Study_Design_and_Method_Selector.py",
-            "pages/8_🗺️_Decision_Flowcharts.py"
+            "pages/7_⏱️_Time_Series_and_Forecasting.py",
+            "pages/8_🎯_Study_Design_and_Method_Selector.py",
+            "pages/9_🗺️_Decision_Flowcharts.py"
         ]
 
         for route in expected_routes:

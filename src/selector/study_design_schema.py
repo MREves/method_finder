@@ -17,7 +17,7 @@ DOMAIN_PROFILES: Dict[str, Dict[str, Any]] = {
         "name": "🏥 Healthcare & Clinical Medicine",
         "organisation": "All Meadows Cardiovascular Institute / Inner City Teaching Hospital",
         "description": "Secondary care, randomized clinical trials, clinical prediction models, and inpatient hospital operations.",
-        "typical_endpoints": ["Biomarker changes", "30-day mortality", "Disease remission", "Length of stay"]
+        "typical_endpoints": ["Biomarker changes", "30-day mortality", "Disease remission", "Length of stay", "Clinical risk scores (QRISK, CURB-65)"]
     },
     "healthcare_public_health": {
         "id": "healthcare_public_health",
@@ -259,6 +259,25 @@ PROBLEM_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "rationale": "WHO and OHID gold-standard methodology using midpoint ridits to measure both absolute gap (SII) and relative risk ratio (RII) across the entire social gradient."
     },
 
+    "clinical_risk_stratification": {
+        "id": "clinical_risk_stratification",
+        "name": "Clinical Risk Stratification & Prognostic Score Formulation",
+        "summary": "Formulate interpretable integer point scores (Sullivan/Framingham) and segment populations into actionable clinical decision tiers (Low, Moderate, High).",
+        "primary_pillar": "epidemiology",
+        "primary_method_key": "risk_stratification",
+        "primary_method_name": "Clinical Risk Stratification & Prognostic Prediction Models",
+        "parametric_type": "Multivariable Integer Scoring & Calibration",
+        "alternative_method_key": "cox_regression",
+        "alternative_method_name": "Cox Proportional Hazards Regression",
+        "alternative_condition": "Use when time-to-event survival trajectories with right-censoring are primary rather than discrete fixed-window risk tiers.",
+        "sample_size_framework": "case_control_or",
+        "sample_size_label": "Prognostic Modeling: Minimum 10-20 Events per Variable (EPV)",
+        "sample_size_params": {"p0": 0.15, "or": 2.00, "k": 1.0, "alpha": 0.05, "power": 0.85},
+        "page_route": "pages/2_🏥_Epidemiology_Methods.py",
+        "deep_link_session": {"epi_nav_mode": "direct", "epi_direct_method_key": "risk_stratification"},
+        "rationale": "Governed by the international TRIPOD statement: converts regression coefficients into whole bedside points, verifies calibration slope and Brier accuracy, and measures Net Benefit via Decision Curve Analysis (DCA)."
+    },
+
     "rare_event_classification": {
         "id": "rare_event_classification",
         "name": "Supervised Prediction of Rare Clinical or Operational Events",
@@ -375,6 +394,22 @@ PROBLEM_BLUEPRINTS: Dict[str, Dict[str, Any]] = {
         "sample_scale": "medium",
         "governance_priority": "trial_sizing",
         "takeaway": "Requires Welch's t-test for the primary endpoint analysis, coupled with a formal sample size calculation with 15% attrition cushion to guarantee 85% statistical power."
+    },
+
+    "bp_clinical_risk_prediction": {
+        "id": "bp_clinical_risk_prediction",
+        "title": "Prognostic Risk Prediction & Clinical Stratification Score",
+        "domain": "healthcare_clinical",
+        "domain_name": "🏥 Healthcare & Clinical Medicine",
+        "organisation": "All Meadows Cardiovascular Institute",
+        "problem_key": "clinical_risk_stratification",
+        "description": "Formulating and validating an interpretable 10-year cardiovascular or pneumonia risk scoring model (Framingham / QRISK / CURB-65) to categorize patients into actionable decision tiers (Low, Moderate, High).",
+        "icon": "🗂️",
+        "endpoint_type": "binary_risk",
+        "study_design": "prognostic_cohort",
+        "sample_scale": "medium",
+        "governance_priority": "clinical_governance",
+        "takeaway": "Requires Sullivan/Framingham point conversion, TRIPOD-compliant calibration slope verification, AUROC discrimination, and Decision Curve Analysis (DCA) to confirm positive Net Benefit."
     },
 
     "bp_hospital_outpatient_dna": {

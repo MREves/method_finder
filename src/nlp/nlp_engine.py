@@ -455,6 +455,7 @@ def calculate_naive_bayes_svm(texts: List[str], labels: List[str]) -> Dict[str, 
 
     df_details = pd.DataFrame({
         "Document_ID": [f"Incident #{i+1}" for i in range(n_samples)],
+        "Incident_Text": texts,
         "True_Class": labels,
         "Predicted_Class": predictions,
         "Confidence": [f"{round(c * 100, 1)}%" for c in confidences],

@@ -127,6 +127,7 @@ def render_problem_definition_form(active_blueprint: Optional[Dict[str, Any]] = 
         "case_control_retrospective": "🔍 Sample Diseased Cases vs. Healthy Controls (Odds Ratio in Rare Disease)",
         "diagnostic_accuracy": "🎯 Evaluate a Diagnostic Test, Biomarker or Screening Device",
         "survival_time_to_event": "⏳ Follow Longitudinal Cohorts with Right-Censoring (Time-to-Event)",
+        "clinical_risk_stratification": "🗂️ Formulate Clinical Risk Score & Tiers (Sullivan Points, TRIPOD, Calibration & DCA)",
         "demand_forecasting": "⏱️ Forecast Sequential Daily/Weekly Operational Demand (Time Series)",
         "predict_rare_event": "🔮 Predict Individual Binary High-Risk Events (Rare Clinical Event / Failure / Churn)",
         "equity_fairness": "⚖️ Audit Algorithmic Disparate Impact & Fairness (Four-Fifths 80% Rule)",
@@ -145,6 +146,7 @@ def render_problem_definition_form(active_blueprint: Optional[Dict[str, Any]] = 
         "retrospective_case_control": "case_control_retrospective",
         "diagnostic_screening_evaluation": "diagnostic_accuracy",
         "survival_time_to_event": "survival_time_to_event",
+        "clinical_risk_stratification": "clinical_risk_stratification",
         "time_series_forecasting": "demand_forecasting",
         "rare_event_classification": "predict_rare_event",
         "algorithmic_fairness_audit": "equity_fairness",
@@ -345,6 +347,10 @@ def render_problem_definition_form(active_blueprint: Optional[Dict[str, Any]] = 
         inferred_problem_key = "unsupervised_phenotyping"
     elif selected_goal == "dimension_reduction":
         inferred_problem_key = "dimension_reduction_pca"
+    elif selected_goal == "health_inequality_gradient":
+        inferred_problem_key = "health_inequality_gradient"
+    elif selected_goal == "clinical_risk_stratification":
+        inferred_problem_key = "clinical_risk_stratification"
 
     return {
         "domain": selected_domain,

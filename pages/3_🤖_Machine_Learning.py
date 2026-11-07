@@ -194,6 +194,27 @@ st.markdown("---")
 # 8. Primary Metric Dashboard & Executive KPI Summary
 render_ml_kpi_dashboard(scenario_key, meta, params, calc_results)
 
+if task_family == "classification" or scenario_key in ("clinical_readmission", "operational_dna_equity"):
+    st.info("""
+    💡 **Translating ML Predictions into Interpretable Bedside Scores:**  
+    While complex algorithms (like Random Forests, XGBoost, or Neural Nets) optimize non-linear discrimination, clinical medicine and healthcare governance often mandate **interpretable integer point scores** (e.g., Framingham, QRISK, or CURB-65) governed by the international **TRIPOD statement**, calibration slopes, and **Decision Curve Analysis (DCA)**.
+    """)
+    st.page_link(
+        "pages/2_🏥_Epidemiology_Methods.py",
+        label="Explore Clinical Risk Stratification & Bedside Point Scoring in Epidemiology 🗂️",
+        icon="🗂️"
+    )
+elif task_family == "time_series" or scenario_key in ("ed_demand_forecasting", "workforce_sickness_forecasting", "supply_chain_demand_forecasting"):
+    st.info("""
+    ⏱️ **Comprehensive Time Series Analysis & Decomposition:**  
+    Looking for a full educational breakdown of time series anatomy (additive vs. multiplicative decomposition, ACF/PACF correlograms, Augmented Dickey-Fuller stationarity tests, and a deep-dive comparison of MAE vs. RMSE vs. MASE vs. MAPE)?
+    """)
+    st.page_link(
+        "pages/7_⏱️_Time_Series_and_Forecasting.py",
+        label="Explore Dedicated Time Series Analysis & Forecasting Module ⏱️",
+        icon="⏱️"
+    )
+
 st.markdown("---")
 
 # 9. Plotly Interactive Visualizers

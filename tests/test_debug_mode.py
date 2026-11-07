@@ -21,8 +21,8 @@ TRACKER_PAGES = [
     "pages/4_📐_Sample_Size_and_Power.py",
     "pages/5_📋_Survey_and_Questionnaire_Analysis.py",
     "pages/6_🗣️_Natural_Language_Processing.py",
-    "pages/7_🎯_Study_Design_and_Method_Selector.py",
-    "pages/8_🗺️_Decision_Flowcharts.py"
+    "pages/8_🎯_Study_Design_and_Method_Selector.py",
+    "pages/9_🗺️_Decision_Flowcharts.py"
 ]
 
 
