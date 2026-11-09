@@ -314,7 +314,7 @@ class TestExpanderASTCompliance(unittest.TestCase):
     """Enforces 100% compliance with st.expander(expanded=False) across all selector code."""
 
     def test_selector_page_expanders_are_collapsed(self):
-        selector_page_path = os.path.join(PROJECT_ROOT, "pages", "8_🎯_Study_Design_and_Method_Selector.py")
+        selector_page_path = os.path.join(PROJECT_ROOT, "pages", "13_🎯_Study_Design_and_Method_Selector.py")
         with open(selector_page_path, "r", encoding="utf-8") as f:
             tree = ast.parse(f.read(), filename=selector_page_path)
 
@@ -379,6 +379,7 @@ class TestSidebarNavigation(unittest.TestCase):
     def test_all_pages_call_custom_sidebar_navigation(self):
         all_pages = [
             os.path.join(PROJECT_ROOT, "app.py"),
+            os.path.join(PROJECT_ROOT, "pages", "0_📚_Statistical_Fundamentals.py"),
             os.path.join(PROJECT_ROOT, "pages", "1_📊_Statistical_Tests.py"),
             os.path.join(PROJECT_ROOT, "pages", "2_🏥_Epidemiology_Methods.py"),
             os.path.join(PROJECT_ROOT, "pages", "3_🤖_Machine_Learning.py"),
@@ -386,8 +387,13 @@ class TestSidebarNavigation(unittest.TestCase):
             os.path.join(PROJECT_ROOT, "pages", "5_📋_Survey_and_Questionnaire_Analysis.py"),
             os.path.join(PROJECT_ROOT, "pages", "6_🗣️_Natural_Language_Processing.py"),
             os.path.join(PROJECT_ROOT, "pages", "7_⏱️_Time_Series_and_Forecasting.py"),
-            os.path.join(PROJECT_ROOT, "pages", "8_🎯_Study_Design_and_Method_Selector.py"),
-            os.path.join(PROJECT_ROOT, "pages", "9_🗺️_Decision_Flowcharts.py"),
+            os.path.join(PROJECT_ROOT, "pages", "8_🔍_Causal_Inference_and_Policy_Evaluation.py"),
+            os.path.join(PROJECT_ROOT, "pages", "9_📈_Statistical_Process_Control_and_Quality_Improvement.py"),
+            os.path.join(PROJECT_ROOT, "pages", "10_💷_Health_Economics_and_HTA.py"),
+            os.path.join(PROJECT_ROOT, "pages", "11_🧩_Missing_Data_and_Imputation.py"),
+            os.path.join(PROJECT_ROOT, "pages", "12_🪜_Longitudinal_and_Mixed_Models.py"),
+            os.path.join(PROJECT_ROOT, "pages", "13_🎯_Study_Design_and_Method_Selector.py"),
+            os.path.join(PROJECT_ROOT, "pages", "14_🗺️_Decision_Flowcharts.py"),
         ]
         for p in all_pages:
             self.assertTrue(os.path.isfile(p), f"Page file does not exist: {p}")

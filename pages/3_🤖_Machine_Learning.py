@@ -67,19 +67,6 @@ theoretical algorithms and frontline healthcare delivery. Whether you are predic
 this guide ensures rigorous biostatistical methodology, zero temporal leakage, and ethical AI deployment.
 """)
 
-# Quick Navigation Link back to Core Hub
-c_nav1, c_nav2, c_nav3, c_nav4 = st.columns(4)
-with c_nav1:
-    st.page_link("app.py", label="← Home Overview Hub", icon="🏠")
-with c_nav2:
-    st.page_link("pages/1_📊_Statistical_Tests.py", label="Statistical Tests", icon="📊")
-with c_nav3:
-    st.page_link("pages/2_🏥_Epidemiology_Methods.py", label="Epidemiology Methods", icon="🏥")
-with c_nav4:
-    st.page_link("pages/4_📐_Sample_Size_and_Power.py", label="Sample Size & Power", icon="📐")
-
-st.markdown("---")
-
 # 3. Plain English Pedagogical Introductory Guide (Zero Knowledge)
 render_ml_plain_english_guide()
 

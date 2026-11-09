@@ -31,7 +31,8 @@ from src.time_series.ts_engine import (
     generate_ed_demand_series,
     generate_seasonal_flu_series,
     generate_ambulance_callout_series,
-    generate_intermittent_stockout_series
+    generate_intermittent_stockout_series,
+    TIME_SERIES_ALGORITHMS
 )
 
 st.set_page_config(
@@ -46,6 +47,10 @@ render_custom_sidebar_navigation("pages/7_⏱️_Time_Series_and_Forecasting.py"
 # Top Header & Contextual Breadcrumb
 render_time_series_header()
 render_roundtrip_navigation_banner()
+
+if "ts_direct_method_key" in st.session_state and st.session_state["ts_direct_method_key"] in TIME_SERIES_ALGORITHMS:
+    algo_name = TIME_SERIES_ALGORITHMS[st.session_state["ts_direct_method_key"]]["name"]
+    st.success(f"⚡ **Direct Method Jump Active:** Preselected **{algo_name}**. Navigate to the **'🔮 2. Forecasting Model Hierarchy Sandbox'** tab below to explore its live parameters, interactive forecast, and worked guides.")
 
 st.info("💡 **Educational Disclaimer:** All operational time series, emergency department attendances, laboratory positivity rates, and surgical inventory records across this module are completely synthetic and fabricated solely for education and methodological training purposes.")
 

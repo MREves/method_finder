@@ -35,8 +35,8 @@ def render_nlp_mode_selector() -> Tuple[str, str]:
     """Renders the top mode selector: Guided Problem-to-Method Wizard vs. Direct Method Explorer."""
     method_options = {f"{m['icon']} {m['name']} ({m['category'].split(':')[0]})": k for k, m in NLP_METHODS.items()}
 
-    # Check if a method was pre-selected from Flowcharts or Selector
-    preselected = st.session_state.pop("active_nlp_method", None)
+    # Check if a method was pre-selected from Flowcharts, Selector, or Home Page
+    preselected = st.session_state.pop("active_nlp_method", None) or st.session_state.get("nlp_direct_method_key")
     if preselected and preselected in NLP_METHODS:
         st.session_state["nlp_nav_mode_radio"] = "🔍 Direct Method Explorer"
         for label, k in method_options.items():
@@ -46,10 +46,11 @@ def render_nlp_mode_selector() -> Tuple[str, str]:
 
     c_mode1, c_mode2 = st.columns([1.5, 3])
     with c_mode1:
+        default_radio_idx = 1 if st.session_state.get("nlp_nav_mode_radio") == "🔍 Direct Method Explorer" else 0
         mode = st.radio(
             "Navigation Mode:",
             ["🎯 Guided Problem Wizard", "🔍 Direct Method Explorer"],
-            index=0,
+            index=default_radio_idx,
             horizontal=False,
             key="nlp_nav_mode_radio"
         )
@@ -68,13 +69,19 @@ def render_nlp_mode_selector() -> Tuple[str, str]:
             meta = NLP_METHODS[selected_method_key]
             st.success(f"**Recommended Method:** {meta['icon']} **{meta['name']}** — *{meta['category']}*")
         else:
+            options_list = list(method_options.keys())
+            default_nlp_idx = 0
+            if "nlp_direct_select" in st.session_state and st.session_state["nlp_direct_select"] in options_list:
+                default_nlp_idx = options_list.index(st.session_state["nlp_direct_select"])
+
             selected_display = st.selectbox(
                 "Select NLP Method Directly:",
-                options=list(method_options.keys()),
-                index=0,
+                options=options_list,
+                index=default_nlp_idx,
                 key="nlp_direct_select"
             )
             selected_method_key = method_options[selected_display]
+            st.session_state["nlp_direct_method_key"] = selected_method_key
             
     st.markdown("---")
     return mode, selected_method_key

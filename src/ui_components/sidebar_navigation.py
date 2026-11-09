@@ -53,12 +53,12 @@ def render_custom_sidebar_navigation(current_page: str = ""):
         icon="🏠"
     )
     st.sidebar.page_link(
-        "pages/8_🎯_Study_Design_and_Method_Selector.py",
+        "pages/13_🎯_Study_Design_and_Method_Selector.py",
         label="Study Design & Selector",
         icon="🎯"
     )
     st.sidebar.page_link(
-        "pages/9_🗺️_Decision_Flowcharts.py",
+        "pages/14_🗺️_Decision_Flowcharts.py",
         label="Decision Trees & Flowcharts",
         icon="🗺️"
     )
@@ -133,7 +133,12 @@ def render_custom_sidebar_navigation(current_page: str = ""):
         "📐 4. Sample Size & Power": "pages/4_📐_Sample_Size_and_Power.py",
         "📋 5. Survey & Questionnaire Analysis": "pages/5_📋_Survey_and_Questionnaire_Analysis.py",
         "🗣️ 6. Natural Language Processing": "pages/6_🗣️_Natural_Language_Processing.py",
-        "⏱️ 7. Time Series & Forecasting": "pages/7_⏱️_Time_Series_and_Forecasting.py"
+        "⏱️ 7. Time Series & Forecasting": "pages/7_⏱️_Time_Series_and_Forecasting.py",
+        "🔍 8. Causal Inference & Policy Evaluation": "pages/8_🔍_Causal_Inference_and_Policy_Evaluation.py",
+        "📈 9. Statistical Process Control & QI": "pages/9_📈_Statistical_Process_Control_and_Quality_Improvement.py",
+        "💷 10. Health Economics & HTA": "pages/10_💷_Health_Economics_and_HTA.py",
+        "🧩 11. Missing Data & Imputation": "pages/11_🧩_Missing_Data_and_Imputation.py",
+        "🪜 12. Longitudinal & Mixed Models": "pages/12_🪜_Longitudinal_and_Mixed_Models.py"
     }
 
     # Clean key for selectbox to avoid conflicts across page reruns
@@ -187,13 +192,38 @@ def render_custom_sidebar_navigation(current_page: str = ""):
         label="7. Time Series & Forecasting",
         icon="⏱️"
     )
+    st.sidebar.page_link(
+        "pages/8_🔍_Causal_Inference_and_Policy_Evaluation.py",
+        label="8. Causal Inference & Policy",
+        icon="🔍"
+    )
+    st.sidebar.page_link(
+        "pages/9_📈_Statistical_Process_Control_and_Quality_Improvement.py",
+        label="9. Statistical Process Control (SPC)",
+        icon="📈"
+    )
+    st.sidebar.page_link(
+        "pages/10_💷_Health_Economics_and_HTA.py",
+        label="10. Health Economics & HTA",
+        icon="💷"
+    )
+    st.sidebar.page_link(
+        "pages/11_🧩_Missing_Data_and_Imputation.py",
+        label="11. Missing Data & Imputation",
+        icon="🧩"
+    )
+    st.sidebar.page_link(
+        "pages/12_🪜_Longitudinal_and_Mixed_Models.py",
+        label="12. Longitudinal & Mixed Models",
+        icon="🪜"
+    )
 
     st.sidebar.markdown("---")
 
 
 def render_roundtrip_navigation_banner():
     """Renders a non-intrusive contextual breadcrumb banner at the top of educational training pages
-    when navigated from the Study Design & Method Selector (Page 8).
+    when navigated from the Study Design & Method Selector (Page 13).
     """
     consultation = st.session_state.get("selector_consultation") if hasattr(st, "session_state") else None
     if not isinstance(consultation, dict) or not consultation.get("active"):
@@ -207,7 +237,7 @@ def render_roundtrip_navigation_banner():
     domain_text = f" • <strong>Domain:</strong> {domain_name}" if domain_name else ""
     source_title = consultation.get("source_title", "Study Design Selector")
     source_icon = consultation.get("source_icon", "🎯")
-    return_page = consultation.get("return_page", "pages/8_🎯_Study_Design_and_Method_Selector.py")
+    return_page = consultation.get("return_page", "pages/13_🎯_Study_Design_and_Method_Selector.py")
     return_label = consultation.get("return_label", "← Return to Selector")
     sub_text = consultation.get("sub_text", "Method pre-selected based on research objective & data architecture")
 

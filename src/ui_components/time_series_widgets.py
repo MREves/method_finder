@@ -318,23 +318,44 @@ def render_models_tab(scenario_data: Dict[str, Any]) -> None:
     dates = scenario_data["dates"]
     m = scenario_data["seasonal_period"]
 
+    model_options = [
+        "1. Naive Baseline (Last Value)",
+        "2. Seasonal Naive Baseline",
+        "3. Drift Baseline (Linear Extrapolation)",
+        "4. Simple Exponential Smoothing (SES)",
+        "5. Holt's Linear Trend (Damped)",
+        "6. Holt-Winters Triple Exponential Smoothing",
+        "7. Lagged Feature Ridge Regression (ML)",
+        "8. Croston SBA (Intermittent Demand)"
+    ]
+    key_to_ts_opt = {
+        "naive": model_options[0],
+        "seasonal_naive": model_options[1],
+        "drift": model_options[2],
+        "ses": model_options[3],
+        "holt_linear": model_options[4],
+        "holt_winters": model_options[5],
+        "lagged_ml": model_options[6],
+        "croston": model_options[7]
+    }
+    ts_opt_to_key = {v: k for k, v in key_to_ts_opt.items()}
+
+    default_ts_idx = 0
+    preselected_ts_key = st.session_state.get("ts_direct_method_key")
+    if preselected_ts_key in key_to_ts_opt:
+        default_ts_idx = model_options.index(key_to_ts_opt[preselected_ts_key])
+
     c_m1, c_m2, c_m3 = st.columns([1.3, 1.0, 1.0])
     with c_m1:
         model_choice = st.selectbox(
             "Select Forecasting Algorithm:",
-            options=[
-                "1. Naive Baseline (Last Value)",
-                "2. Seasonal Naive Baseline",
-                "3. Drift Baseline (Linear Extrapolation)",
-                "4. Simple Exponential Smoothing (SES)",
-                "5. Holt's Linear Trend (Damped)",
-                "6. Holt-Winters Triple Exponential Smoothing",
-                "7. Lagged Feature Ridge Regression (ML)",
-                "8. Croston SBA (Intermittent Demand)"
-            ],
+            options=model_options,
+            index=default_ts_idx,
             key="ts_model_sandbox_select",
             help="Choose any algorithm to inspect its forecast, parameter controls, mathematical formula, and operational pros/cons."
         )
+        if model_choice in ts_opt_to_key:
+            st.session_state["ts_direct_method_key"] = ts_opt_to_key[model_choice]
     with c_m2:
         horizon = st.slider(
             "Forecast Horizon Steps ($h$):",

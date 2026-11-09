@@ -48,6 +48,11 @@ from src.ui_components.sample_size_badge import render_sample_size_deep_link_bad
 
 def render_survey_mode_selector() -> Tuple[str, str]:
     """Renders toggle between Guided Survey Wizard and Direct Method Explorer."""
+    if "survey_direct_method_key" in st.session_state and st.session_state["survey_direct_method_key"] in SURVEY_METHODS:
+        st.session_state["survey_nav_mode_radio"] = "🔍 Direct Method Explorer"
+    elif "survey_nav_mode_radio" not in st.session_state:
+        st.session_state["survey_nav_mode_radio"] = "🎯 Guided Decision Wizard"
+
     c_mode1, c_mode2 = st.columns([2.5, 1.5])
     with c_mode1:
         nav_mode = st.radio(
@@ -107,15 +112,25 @@ def render_survey_direct_explorer() -> str:
     method_choices = {
         f"{m['icon']} {m['name']}": k for k, m in SURVEY_METHODS.items()
     }
+    choice_labels = list(method_choices.keys())
     
+    default_idx = 0
+    preselected_key = st.session_state.get("survey_direct_method_key")
+    if preselected_key:
+        for idx, (label, k) in enumerate(method_choices.items()):
+            if k == preselected_key:
+                default_idx = idx
+                break
+                
     selected_label = st.selectbox(
         "Select survey method or psychometric tool:",
-        options=list(method_choices.keys()),
-        index=0,
+        options=choice_labels,
+        index=default_idx,
         key="survey_direct_method_select"
     )
-    
-    return method_choices[selected_label]
+    chosen_key = method_choices[selected_label]
+    st.session_state["survey_direct_method_key"] = chosen_key
+    return chosen_key
 
 
 # =====================================================================

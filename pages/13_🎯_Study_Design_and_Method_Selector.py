@@ -40,7 +40,7 @@ st.set_page_config(
 )
 
 # Render Custom Grouped Sidebar Navigation
-render_custom_sidebar_navigation("pages/8_🎯_Study_Design_and_Method_Selector.py")
+render_custom_sidebar_navigation("pages/13_🎯_Study_Design_and_Method_Selector.py")
 
 st.title("🎯 Universal Study Design & Method Selector")
 st.markdown("""
@@ -77,27 +77,6 @@ if st.session_state.get("debug_mode", False) or st.session_state.get("debug_mode
         * [x] **3-Pillar Pedagogical Comparison Matrix** (Statistics vs. Epidemiology vs. Machine Learning)
         * [x] **One-Click Deep-Linking Navigation** (Preserves isolated training environments while auto-configuring pre-selected state)
         """)
-
-# ----------------- Quick Navigation Hub -----------------
-c_nav1, c_nav2, c_nav3, c_nav4, c_nav5, c_nav6, c_nav7, c_nav8 = st.columns(8)
-with c_nav1:
-    st.page_link("app.py", label="Home Overview Hub", icon="🏠")
-with c_nav2:
-    st.page_link("pages/8_🗺️_Decision_Flowcharts.py", label="Decision Flowcharts", icon="🗺️")
-with c_nav3:
-    st.page_link("pages/1_📊_Statistical_Tests.py", label="Statistical Tests", icon="📊")
-with c_nav4:
-    st.page_link("pages/2_🏥_Epidemiology_Methods.py", label="Epidemiology Methods", icon="🏥")
-with c_nav5:
-    st.page_link("pages/3_🤖_Machine_Learning.py", label="Machine Learning", icon="🤖")
-with c_nav6:
-    st.page_link("pages/4_📐_Sample_Size_and_Power.py", label="Sample Size & Power", icon="📐")
-with c_nav7:
-    st.page_link("pages/5_📋_Survey_and_Questionnaire_Analysis.py", label="Survey Analysis", icon="📋")
-with c_nav8:
-    st.page_link("pages/6_🗣️_Natural_Language_Processing.py", label="NLP", icon="🗣️")
-
-st.markdown("---")
 
 # ----------------- Sidebar Reference Context -----------------
 with st.sidebar:

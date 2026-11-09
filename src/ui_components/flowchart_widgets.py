@@ -45,6 +45,11 @@ def render_master_triage_flowchart() -> None:
     * **Pillar 3: Machine Learning & AI** — Predictive scoring, handling high-dimensional complex patterns, rare event detection, and unsupervised phenotypic discovery.
     * **Pillar 4: Biostatistical Sample Size & Power** — Formal trial planning, minimal detectable differences, and ethical sample sizing.
     * **Pillar 5: Qualitative Analysis & NLP** — Extracting structured insights, sentiment, negation, topics, clinical entities, and factual synthesis from unstructured text narratives.
+    * **Pillar 8: Causal Inference & Policy Evaluation** — Quasi-experimental architectures (DiD, ITS, PSM, RDD, Instrumental Variables) to infer counterfactual cause-and-effect when RCTs are unethical or unfeasible.
+    * **Pillar 9: Statistical Process Control & QI** — Shewhart control charts, Laney overdispersion corrections (p', u'), and NHS Making Data Count icons to distinguish common cause noise from authentic special causes.
+    * **Pillar 10: Health Economics & HTA** — Cost-effectiveness analysis, ICERs, QALYs, 3.5% NICE discounting, Markov state transitions, Monte Carlo PSA, and 5-year NHS Budget Impact Analysis.
+    * **Pillar 11: Missing Data Mechanisms & Imputation** — Rubin's taxonomy (MCAR vs MAR vs MNAR), Little's test, MICE with Rubin's pooling, algorithmic k-NN/MissForest, and ICH E9 (R1) tipping point sensitivity audits.
+    * **Pillar 12: Longitudinal & Hierarchical Mixed-Effects Models** — Laird & Ware LMM formulation (random intercepts & slopes), GLMM subject-specific vs marginal odds ratios, RM-ANOVA sphericity & missing data recovery, 3-level organizational nesting, and Nakagawa conditional $R^2$.
     """)
 
     # Visual Mermaid Diagram
@@ -54,7 +59,9 @@ flowchart TD
 
     Q1 -->|"Hypothesis Testing & Causal Inference"| Q2{"Was Data Collected under Controlled / Randomized Conditions?"}
     Q2 -->|"Yes: Controlled / RCT / Pre-Post"| P1["📊 Pillar 1: Classical Statistical Tests<br/>(t-tests, ANOVA, Mann-Whitney, Chi-Square)"]
-    Q2 -->|"No: Observational Cohort / Survey"| P2["🏥 Pillar 2: Observational Epidemiology<br/>(Relative Risk, Odds Ratio, Standardization, Confounding)"]
+    Q2 -->|"No: Observational Data"| QCausal{"Evaluating Policy Shock, Cutoff Rule, or Counterfactual?"}
+    QCausal -->|"Yes: Quasi-Experimental Policy Evaluation"| P8["🔍 Pillar 8: Causal Inference & Policy Evaluation<br/>(DiD, ITS, Propensity Matching, RDD, IV/2SLS)"]
+    QCausal -->|"No: Observational Cohort / Survey"| P2["🏥 Pillar 2: Observational Epidemiology<br/>(Relative Risk, Odds Ratio, Standardization, Confounding)"]
 
     Q1 -->|"Predictive Scoring, Automation or Pattern Discovery"| Q3{"Are Ground-Truth Target Labels Available?"}
     Q3 -->|"Yes: Target Y Known"| ML_Sup["🤖 Pillar 3: Supervised ML<br/>(Regularized Regression, Cost-Sensitive Ensembles, PR-AUC)"]
@@ -64,23 +71,41 @@ flowchart TD
 
     Q1 -->|"Unstructured Text & Qualitative Language Insights"| P5["🗣️ Pillar 5: Qualitative Analysis & NLP<br/>(Sentiment, NegEx, TF-IDF, Topics, Embeddings, LLM RAG)"]
 
+    Q1 -->|"Quality Improvement & Healthcare Process Monitoring"| P9["📈 Pillar 9: Statistical Process Control & QI<br/>(Run Charts, Shewhart XmR, Laney p' & u', NHS MDC Icons)"]
+
+    Q1 -->|"Cost-Effectiveness, QALYs & Healthcare Payer Decision"| P10["💷 Pillar 10: Health Economics & HTA<br/>(ICER & CE Plane, Markov Models, NMB, PSA & BIA)"]
+
+    Q1 -->|"Missing Data Audits & Imputation Strategy"| P11["🧩 Pillar 11: Missing Data & Imputation<br/>(Little's Test, Listwise Hazard, MICE Pooling, k-NN, Tipping Point)"]
+
+    Q1 -->|"Repeated Measures / Clustered Hierarchies"| P12["🪜 Pillar 12: Longitudinal & Mixed Models<br/>(Random Slopes, GLMM, Sphericity Breakdown, 3-Level Nesting, Nakagawa R²)"]
+
     P1 -.->|"Requires Power Sizing"| P4
     P2 -.->|"Requires Power Sizing"| P4
     ML_Unsup -.->|"Requires Sample Sizing"| P4
 
     classDef primary fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#166534;
     classDef epi fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af;
+    classDef causal fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#065f46;
     classDef ml fill:#faf5ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
     classDef power fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#9a3412;
     classDef nlp fill:#f0f9ff,stroke:#0284c7,stroke-width:2px,color:#0369a1;
+    classDef spc fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#166534;
+    classDef hta fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#854d0e;
+    classDef missing fill:#f5f3ff,stroke:#7c3aed,stroke-width:2px,color:#5b21b6;
     classDef decision fill:#f8fafc,stroke:#64748b,stroke-width:2px,color:#0f172a;
 
     class P1 primary;
     class P2 epi;
+    class P8 causal;
     class ML_Sup,ML_Unsup ml;
     class P4 power;
     class P5 nlp;
-    class Q1,Q2,Q3 decision;
+    class P9 spc;
+    classDef mixed fill:#eef2ff,stroke:#4f46e5,stroke-width:2px,color:#312e81;
+    class P10 hta;
+    class P11 missing;
+    class P12 mixed;
+    class Q1,Q2,QCausal,Q3 decision;
 ```"""
     st.markdown(mermaid_code)
 
@@ -155,7 +180,12 @@ flowchart TD
                 "Forecast sequential time series demand",
                 "Discover unknown sub-phenotypes / patient clusters",
                 "Determine required sample size for a grant proposal",
-                "Analyze unstructured text, clinical notes, or qualitative comments (NLP)"
+                "Analyze unstructured text, clinical notes, or qualitative comments (NLP)",
+                "Evaluate policy shock or causal effect without RCT (Quasi-Experimental)",
+                "Monitor longitudinal healthcare process / detect special cause variation (SPC & QI)",
+                "Evaluate cost-effectiveness, QALYs, or NHS budget impact (Health Economics & HTA)",
+                "Audit missing data mechanisms / multiple imputation & sensitivity (Rubin MICE & Tipping Point)",
+                "Model longitudinal repeated measures / hierarchical clusters (Random slopes, GLMM & 3-level nesting)"
             ],
             key="triage_goal_select"
         )
@@ -170,7 +200,8 @@ flowchart TD
                 "Cross-Sectional Diagnostic Accuracy Study",
                 "High-Dimensional EHR / Telemetry Matrix",
                 "Pre-Study Design Planning Stage",
-                "Unstructured Text / Clinical Notes / Survey Free-Text"
+                "Unstructured Text / Clinical Notes / Survey Free-Text",
+                "Sequential Process Time Series (Monthly/Weekly QI Audits)"
             ],
             key="triage_data_select"
         )
@@ -195,7 +226,43 @@ flowchart TD
     resolved_border = "#16a34a"
     resolved_rationale = "Testing differences between 2 experimental groups with continuous endpoint."
 
-    if "unstructured text" in triage_goal.lower() or "free-text" in triage_data.lower() or "clinical notes" in triage_data.lower():
+    if "longitudinal" in triage_goal.lower() or "mixed" in triage_goal.lower() or "multilevel" in triage_goal.lower() or "hierarchical" in triage_goal.lower():
+        resolved_pillar = "Longitudinal & Hierarchical Mixed-Effects Models"
+        resolved_method = "Linear Mixed Models (LMM) / GLMM / 3-Level Multilevel Models"
+        resolved_page = "pages/12_🪜_Longitudinal_and_Mixed_Models.py"
+        resolved_icon = "🪜"
+        resolved_color = "#312e81"
+        resolved_bg = "#eef2ff"
+        resolved_border = "#4f46e5"
+        resolved_rationale = "Modeling repeated patient measurements, personalized trajectories (random intercepts & slopes), non-collapsible GLMM odds ratios, and partitioning variance across organizational hierarchies."
+    elif "missing data" in triage_goal.lower() or "imputation" in triage_goal.lower() or "tipping point" in triage_goal.lower():
+        resolved_pillar = "Missing Data Mechanisms & Imputation"
+        resolved_method = "Rubin's Taxonomy / MICE (Chained Equations) / Tipping Point Analysis"
+        resolved_page = "pages/11_🧩_Missing_Data_and_Imputation.py"
+        resolved_icon = "🧩"
+        resolved_color = "#5b21b6"
+        resolved_bg = "#f5f3ff"
+        resolved_border = "#7c3aed"
+        resolved_rationale = "Auditing MCAR/MAR/MNAR mechanisms, avoiding single imputation variance collapse, pooling m datasets via Rubin's rules, and conducting ICH E9 tipping point sensitivity audits."
+    elif "cost-effectiveness" in triage_goal.lower() or "qaly" in triage_goal.lower() or "budget impact" in triage_goal.lower() or "health economics" in triage_goal.lower():
+        resolved_pillar = "Health Economics & Health Technology Assessment (HTA / NICE)"
+        resolved_method = "Cost-Effectiveness (ICER / NMB) / Markov Cohort / PSA / Budget Impact Analysis"
+        resolved_page = "pages/10_💷_Health_Economics_and_HTA.py"
+        resolved_icon = "💷"
+        resolved_color = "#854d0e"
+        resolved_bg = "#fefce8"
+        resolved_border = "#ca8a04"
+        resolved_rationale = "Evaluating lifetime cost per QALY gained, opportunity costs, Markov chronic disease transitions, and 5-year payer affordability for NHS reimbursement."
+    elif "special cause" in triage_goal.lower() or "spc" in triage_goal.lower() or "qi audits" in triage_data.lower():
+        resolved_pillar = "Statistical Process Control (SPC) & Quality Improvement"
+        resolved_method = "Run Charts / Shewhart XmR / Laney p' & u' / NHS Making Data Count"
+        resolved_page = "pages/9_📈_Statistical_Process_Control_and_Quality_Improvement.py"
+        resolved_icon = "📈"
+        resolved_color = "#047857"
+        resolved_bg = "#ecfdf5"
+        resolved_border = "#10b981"
+        resolved_rationale = "Distinguishing common cause from special cause variation, avoiding tampering, and evaluating QI interventions using Shewhart and Laney control limits."
+    elif "unstructured text" in triage_goal.lower() or "free-text" in triage_data.lower() or "clinical notes" in triage_data.lower():
         resolved_pillar = "Qualitative Analysis & NLP"
         resolved_method = "Clinical Text & Natural Language Processing Pipeline"
         resolved_page = "pages/6_🗣️_Natural_Language_Processing.py"
@@ -204,6 +271,15 @@ flowchart TD
         resolved_bg = "#f0f9ff"
         resolved_border = "#0ea5e9"
         resolved_rationale = "Analyzing qualitative, unstructured textual narratives across rule-based, statistical, or foundation LLM architectures."
+    elif "policy shock" in triage_goal.lower() or "quasi-experimental" in triage_goal.lower() or "causal" in triage_goal.lower():
+        resolved_pillar = "Causal Inference & Policy Evaluation"
+        resolved_method = "Difference-in-Differences / Interrupted Time Series / RDD / PSM / IV"
+        resolved_page = "pages/8_🔍_Causal_Inference_and_Policy_Evaluation.py"
+        resolved_icon = "🔍"
+        resolved_color = "#047857"
+        resolved_bg = "#ecfdf5"
+        resolved_border = "#10b981"
+        resolved_rationale = "Evaluating real-world policy shocks, clinical guidelines, and counterfactual effects when RCTs are unethical or unfeasible."
     elif "grant proposal" in triage_goal or "Pre-Study" in triage_data:
         resolved_pillar = "Sample Size & Power"
         resolved_method = "Two Independent Means Sizing (t-test)"
@@ -998,3 +1074,711 @@ flowchart TD
             st.session_state["active_nlp_method"] = nkey
             st.switch_page("pages/6_🗣️_Natural_Language_Processing.py")
 
+
+
+# =====================================================================
+# 8. Causal Inference & Policy Evaluation Decision Tree
+# =====================================================================
+
+def render_causal_inference_decision_tree() -> None:
+    """Renders the comprehensive Causal Inference and Quasi-Experimental Policy Evaluation
+    decision tree covering all 5 architectures.
+    """
+    st.markdown("### 🔍 Causal Inference & Quasi-Experimental Policy Evaluation Decision Tree (5 Architectures)")
+    st.markdown(r"""
+    This decision tree guides you from your **Observational Study Architecture & Policy Assignment Rule** 
+    (Numerical Cutoffs, Temporal Guideline Shocks, Clinical Confounding by Indication, or Omitted Variables) 
+    through **Identifying Assumptions & Falsification Audits** 
+    (Parallel Pre-Trends, Durbin-Watson Autocorrelation, Covariate Balance SMDs, McCrary Density Continuity, and Instrument Relevance $F > 10$) 
+    to the mathematically and econometrically justified causal estimator.
+    """)
+
+    mermaid_code = """```mermaid
+flowchart TD
+    CausalStart(["Observational Policy / Clinical Treatment Question"]) --> AssignMech{"What is the Treatment / Policy Assignment Rule?"}
+
+    %% 1. Regression Discontinuity
+    AssignMech -->|"Strict Numerical Triage Cutoff (e.g. Risk >= 10%)"| CompCheck{"Is Compliance at the Threshold Perfect or Partial?"}
+    CompCheck -->|"Strict: 100% Deterministic Prescribing"| M1["1. Sharp Regression Discontinuity Design (Sharp RDD)<br/>• Local Linear OLS within MSE-optimal bandwidth<br/>• Jump at Cutoff = Unconfounded Intent-to-Treat"]
+    CompCheck -->|"Partial / Fuzzy: Probability Jumps"| M1_fuzzy["1. Fuzzy Regression Discontinuity (Fuzzy RDD)<br/>• Instrumented via Threshold Indicator (2SLS)<br/>• Local Average Treatment Effect (LATE) for Compliers"]
+
+    %% 2. Temporal Policy Shock
+    AssignMech -->|"Temporal Policy Shock or National Guideline"| CtrlCheck{"Are Unexposed Comparison Groups Observed Over Time?"}
+    CtrlCheck -->|"No: Single Longitudinal Population Series"| M2["2. Interrupted Time Series (ITS)<br/>• Segmented OLS (Level Shift + Slope Trajectory Change)<br/>• Durbin-Watson Autocorrelation & Newey-West HAC SEs"]
+    CtrlCheck -->|"Yes: Treated & Control Groups Tracked Across Time"| PreTrend{"Do Pre-Policy Trends Run Parallel?"}
+    PreTrend -->|"Yes: Parallel Pre-Trends Confirmed (p > 0.05)"| M3["3. Difference-in-Differences (DiD)<br/>• Two-Way Fixed Effects (TWFE) Panel Regression<br/>• 2x2 Subtraction Matrix & Event Studies"]
+    PreTrend -->|"No: Differential Divergence"| M3_syn["3. Synthetic Control / Covariate-Adjusted DiD<br/>• Convex Optimization of Weighted Donor Units"]
+
+    %% 3. Observational Cohort Selection
+    AssignMech -->|"Clinician / Patient Discretion (Observational Practice)"| ConfCheck{"Are All Key Confounders Measured at Baseline?"}
+    ConfCheck -->|"Yes: Conditional Exchangeability on Observables"| OverlapCheck{"Is There Substantial Propensity Score Overlap?"}
+    OverlapCheck -->|"Yes: Common Support Satisfied"| M4["4. Propensity Score Matching (PSM) & IPTW<br/>• Logistic Propensity Scores & SMD Balance Audits<br/>• 1:1 Nearest-Neighbor Caliper Matching<br/>• Inverse Probability of Treatment Weighting (IPTW)"]
+    OverlapCheck -->|"No: Heavy Off-Support Imbalance"| M4_trim["4. Trimmed IPTW / Overlap Weighting<br/>• Crump Truncation (0.10 <= e_i <= 0.90)"]
+
+    %% 4. Unmeasured Confounding / IV
+    ConfCheck -->|"No: Unmeasured Confounders (Omitted Variable Bias)"| ExogCheck{"Is a Valid Exogenous Instrument (Z) Available?"}
+    ExogCheck -->|"Yes: Z affects X but has no direct path to Y"| M5["5. Instrumental Variables (IV) & Mendelian Randomization<br/>• First-Stage F-Statistic > 10 (Relevance)<br/>• Two-Stage Least Squares (2SLS) & Wald Ratio Estimator"]
+    ExogCheck -->|"No Valid Instrument Available"| Block["Causal Identification Blocked<br/>• Perform Sensitivity Analysis (Rosenbaum Bounds / E-Value)<br/>• Report as Associational Rather than Causal"]
+
+    classDef rdd fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af;
+    classDef its fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#166534;
+    classDef did fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#854d0e;
+    classDef psm fill:#faf5ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
+    classDef iv fill:#fff1f2,stroke:#e11d48,stroke-width:2px,color:#9f1239;
+    classDef decision fill:#f8fafc,stroke:#475569,stroke-width:1.5px,color:#0f172a;
+    classDef blocked fill:#fee2e2,stroke:#ef4444,stroke-width:2px,color:#991b1b;
+
+    class M1,M1_fuzzy rdd;
+    class M2 its;
+    class M3,M3_syn did;
+    class M4,M4_trim psm;
+    class M5 iv;
+    class Block blocked;
+    class CausalStart,AssignMech,CompCheck,CtrlCheck,PreTrend,ConfCheck,OverlapCheck,ExogCheck decision;
+```"""
+    st.markdown(mermaid_code)
+
+    # Triage Principles Container
+    with st.expander("💡 Quasi-Experimental Triage Principles: Counterfactuals, Common Support & Exogeneity", expanded=False):
+        causal_rules_html = r"""
+        <div style="background-color: #f8fafc; border-left: 4px solid #059669; padding: 0.85rem 1.1rem; border-radius: 4px; font-size: 0.88rem; line-height: 1.5; color: #1e293b;">
+            <div style="font-weight: 700; color: #065f46; margin-bottom: 0.35rem;">
+                🔍 Econometric & Epidemiological Rules for Quasi-Experimental Identification
+            </div>
+            • <strong>Regression Discontinuity (Local Randomization):</strong> When clinical guidelines enforce a strict numerical triage cutoff (e.g. statin prescribing at $\text{QRISK} \ge 10.0\%$), patients just above and below the cutoff differ only by chance. RDD estimates the Local Average Treatment Effect (LATE) for patients on the clinical margin of prescribing.<br>
+            • <strong>Interrupted Time Series (Secular Drift vs Shock):</strong> When a national policy shock impacts an entire healthcare population simultaneously with no unexposed comparison group, segmented regression isolates whether the policy caused an immediate intercept level shift ($\beta_2$), a slope trajectory redirection ($\beta_3$), or both, while controlling for autocorrelation via Newey-West HAC.<br>
+            • <strong>Difference-in-Differences (Parallel Pre-Trends):</strong> When unexposed comparison hospitals or geographical regions exist alongside treated units, DiD removes both time-invariant baseline differences and common secular drift. The parallel pre-trends test ($p > 0.05$ on pre-reform leads) must hold.<br>
+            • <strong>Propensity Score Matching (Unconfoundedness on Observables):</strong> In observational cohorts where clinicians choose treatments, matching or IPTW balances observed baseline confounders ($\text{SMD} < 0.10$), mimicking a randomized trial on observable characteristics. It assumes no hidden unmeasured confounders.<br>
+            • <strong>Instrumental Variables & Mendelian Randomization (Omitted Variable Bias):</strong> When unmeasured confounders exist (e.g. lifestyle, frailty), an exogenous instrument $Z$ that influences treatment $X$ without directly affecting outcome $Y$ isolates the unconfounded causal effect via 2SLS. The first-stage $F$-statistic must exceed 10 (Stock-Yogo rule).
+        </div>
+        """
+        render_html(causal_rules_html)
+
+    # Interactive Method Selector
+    st.markdown("#### ⚡ Quick Causal Inference Method Selector")
+    c1, c2 = st.columns(2)
+    with c1:
+        causal_scenario = st.selectbox(
+            "What is your observational evaluation scenario?",
+            options=[
+                "Hospital 7-day staffing reform with unexposed comparison trusts tracked over time",
+                "National prescribing guideline evaluated on a monthly longitudinal sequence before and after launch",
+                "Robotic vs laparoscopic surgical cohort with measured baseline confounders (age, comorbidities)",
+                "Statin therapy initiated strictly at numerical QRISK threshold score (>= 10.0%)",
+                "Biomarker exposure (CRP) subject to unmeasured lifestyle confounding, with genetic variants available"
+            ],
+            key="causal_tree_scenario_select"
+        )
+    with c2:
+        causal_setting = st.selectbox(
+            "Primary identification requirement & data structure:",
+            options=[
+                "Panel data across treated & control units (Test parallel pre-trends)",
+                "Single population longitudinal time series (Check serial autocorrelation)",
+                "Observational cohort with rich baseline covariates (Check common support)",
+                "Sharp or fuzzy numerical triage threshold (Check McCrary density continuity)",
+                "Exogenous genetic allele or geographic distance instrument (Check F > 10)"
+            ],
+            key="causal_tree_setting_select"
+        )
+
+    # Causal Routing
+    causal_routing = {
+        "Hospital 7-day staffing reform with unexposed comparison trusts tracked over time": (
+            "difference_in_differences",
+            "Difference-in-Differences (DiD) & Event Studies",
+            "Two-Way Fixed Effects Panel Analysis"
+        ),
+        "National prescribing guideline evaluated on a monthly longitudinal sequence before and after launch": (
+            "interrupted_time_series",
+            "Interrupted Time Series (ITS) & Segmented Regression",
+            "Single-Population Longitudinal Surveillance"
+        ),
+        "Robotic vs laparoscopic surgical cohort with measured baseline confounders (age, comorbidities)": (
+            "propensity_score_matching",
+            "Propensity Score Matching (PSM) & IPTW",
+            "Observational Confounder Balancing"
+        ),
+        "Statin therapy initiated strictly at numerical QRISK threshold score (>= 10.0%)": (
+            "regression_discontinuity",
+            "Regression Discontinuity Design (Sharp & Fuzzy RDD)",
+            "Quasi-Randomized Cutoff Exploitation"
+        ),
+        "Biomarker exposure (CRP) subject to unmeasured lifestyle confounding, with genetic variants available": (
+            "instrumental_variables",
+            "Instrumental Variables (IV) & Mendelian Randomization",
+            "Exogenous Variation / 2SLS"
+        )
+    }
+
+    ckey, cname, ctier = causal_routing.get(
+        causal_scenario,
+        ("difference_in_differences", "Difference-in-Differences (DiD)", "Quasi-Experimental Panel")
+    )
+
+    st.success(f"🎯 **Recommended Method:** `{cname}` — *{ctier}*")
+    col_jump, _ = st.columns([1.5, 2.5])
+    with col_jump:
+        if st.button(f"Launch {cname} on Page 8 👉", key=f"btn_jump_causal_{ckey}", use_container_width=True):
+            st.session_state["causal_direct_method_key"] = ckey
+            st.session_state["causal_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.switch_page("pages/8_🔍_Causal_Inference_and_Policy_Evaluation.py")
+
+
+# =====================================================================
+# 8. Statistical Process Control (SPC) & Quality Improvement (QI) Tree
+# =====================================================================
+
+def render_spc_qi_decision_tree() -> None:
+    """Renders the comprehensive Statistical Process Control and Quality Improvement
+    decision tree covering all 5 architectures.
+    """
+    st.markdown("### 📈 Statistical Process Control (SPC) & Quality Improvement (QI) Decision Tree (5 Architectures)")
+    st.markdown(r"""
+    This decision tree guides clinical audit teams, healthcare analysts, and QI directors from **Measure Type & Data Scale** 
+    (Continuous Measures, Event Counts, Binomial Proportions, or Executive Target Benchmarks) 
+    through **Overdispersion Audits & Special Cause Detection Rules** 
+    (Laney $\sigma_z$ inflation factor, Shift, Trend, Runs, and Shewhart $3\sigma$ control limits) 
+    to the mathematically and operationally justified SPC chart.
+    """)
+
+    mermaid_code = """```mermaid
+flowchart TD
+    SPCStart(["Clinical Quality or Process Metric"]) --> DataType{"What is the Nature of the Quality Measure?"}
+
+    %% 1. Continuous Measures
+    DataType -->|"Continuous Variable (Wait Times, Length of Stay, Dosing)"| XmR["2. Shewhart XmR / I-MR Chart<br/>• Individual measures & Moving Ranges (k=2)<br/>• Upper/Lower Limits: X-bar ± 2.66 * MR-bar<br/>• Detects step shifts and moving range spikes"]
+
+    %% 2. Proportions / Rates
+    DataType -->|"Defect / Adherence Proportion (Events / Opportunities)"| PropScale{"Are Subgroup Sizes Variable or Very Large (n > 2,000)?"}
+    PropScale -->|"Yes / High Denominator: Test Laney sigma_z"| CheckLaneyP{"Is sigma_z > 1.10 (Between-Subgroup Overdispersion)?"}
+    CheckLaneyP -->|"Yes: Overdispersion Detected"| LaneyP["3. Laney p'-Chart<br/>• Corrects artificially narrow binomial limits<br/>• SE_Laney = SE_p * sigma_z<br/>• Prevents false alarm special causes"]
+    CheckLaneyP -->|"No: Pure Binomial Sampling Noise"| StdP["3. Standard p-Chart<br/>• Classical 3-sigma binomial control limits<br/>• p-bar ± 3 * sqrt(p*(1-p)/n_i)"]
+    PropScale -->|"No / Small Constant Subgroups"| StdP
+
+    %% 3. Count Rates per Unit
+    DataType -->|"Poisson Count Rate (e.g. Infections per 1,000 Bed-Days)"| RateScale{"Are Denominators Large or Susceptible to Clustering?"}
+    RateScale -->|"Yes: Test Laney sigma_z on z-scores"| CheckLaneyU{"Is sigma_z > 1.10 (Overdispersed Poisson)?"}
+    CheckLaneyU -->|"Yes: Laney Inflation Required"| LaneyU["4. Laney u'-Chart<br/>• Poisson rate limits inflated by sigma_z<br/>• Avoids tampering on high bed-day wards"]
+    CheckLaneyU -->|"No: Homogeneous Poisson"| StdU["4. Standard u-Chart<br/>• Classical Poisson rate 3-sigma limits<br/>• u-bar ± 3 * sqrt(u-bar / n_i)"]
+    RateScale -->|"No: Small Equal Exposure Units"| StdU
+
+    %% 4. Initial QI Project / Small Sample
+    DataType -->|"Early-Stage QI Project / Small Sequential Count (N < 20)"| RunChart["1. Healthcare Run Chart<br/>• Baseline median of first 10-12 points<br/>• 4 Non-Random Rules: Shift (>=6), Trend (>=5), Runs, Astronomical Point<br/>• Requires no complex distribution assumptions"]
+
+    %% 5. Board Oversight & Targets
+    DataType -->|"Executive Board Governance vs Fixed Numerical Standard"| MDC["5. NHS Making Data Count & Capability<br/>• Variation Icon: Special Cause (Improvement/Concern) vs Common Cause<br/>• Assurance Icon: Consistent Pass, Flapping, or Consistent Fail<br/>• Process Capability: Cp and Cpk indices"]
+
+    classDef xmr fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af;
+    classDef prop fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#166534;
+    classDef rate fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#854d0e;
+    classDef rc fill:#faf5ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
+    classDef mdc fill:#ecfdf5,stroke:#047857,stroke-width:2px,color:#065f46;
+    classDef decision fill:#f8fafc,stroke:#475569,stroke-width:1.5px,color:#0f172a;
+
+    class XmR xmr;
+    class LaneyP,StdP prop;
+    class LaneyU,StdU rate;
+    class RunChart rc;
+    class MDC mdc;
+    class SPCStart,DataType,PropScale,CheckLaneyP,RateScale,CheckLaneyU decision;
+```"""
+    st.markdown(mermaid_code)
+
+    # Triage Principles Container
+    with st.expander("💡 SPC & Quality Improvement Principles: Deming's Variation, Laney Overdispersion & Tampering", expanded=False):
+        spc_rules_html = r"""
+        <div style="background-color: #f8fafc; border-left: 4px solid #16a34a; padding: 0.85rem 1.1rem; border-radius: 4px; font-size: 0.88rem; line-height: 1.5; color: #1e293b;">
+            <div style="font-weight: 700; color: #166534; margin-bottom: 0.35rem;">
+                📈 Core Principles for Healthcare Quality Improvement & SPC Selection
+            </div>
+            • <strong>Common Cause vs Special Cause Variation:</strong> Common cause variation is the normal, predictable noise inherent in any healthcare system. Special cause variation represents an authentic historical shift or external shock. Reacting to common cause noise as if it were a crisis is <em>tampering</em>, which increases system variance.<br>
+            • <strong>Healthcare Run Charts (Early Project Prototyping):</strong> When launching a new PDSA cycle with fewer than 20 points, a run chart using a 10-12 point baseline median and 4 mathematical probability rules (Shift $\ge 6$, Trend $\ge 5$, Runs count, Astronomical Point) provides immediate statistical rigour without parametric assumptions.<br>
+            • <strong>Shewhart XmR / I-MR Charts (Continuous Individual Metrics):</strong> For continuous indicators where data points arrive one by one (e.g. ED wait time, length of stay), limits are derived from the Average Moving Range ($ar{R}$): $	ext{UCL/LCL} = ar{X} \pm 2.66 	imes ar{R}$.<br>
+            • <strong>Laney p' and u' Overdispersion Correction ($\sigma_z$):</strong> In large hospital trusts ($n_i > 2,000$), standard binomial or Poisson control limits become artificially narrow, triggering frequent false alarms. The Laney adjustment calculates the moving range of standardized $z$-scores to scale limits by $\sigma_z$, restoring authentic $3\sigma$ coverage.<br>
+            • <strong>NHS Making Data Count (MDC):</strong> Pairs process variation with target capability, reporting twin icons: Variation (Common Cause / Special Cause Improvement / Special Cause Concern) and Assurance (Pass / Flapping / Fail) alongside $C_{pk}$ capability indices.
+        </div>
+        """
+        render_html(spc_rules_html)
+
+    # Interactive Method Selector
+    st.markdown("#### ⚡ Quick SPC & Quality Improvement Method Selector")
+    c1, c2 = st.columns(2)
+    with c1:
+        spc_scenario = st.selectbox(
+            "What is your quality improvement or audit scenario?",
+            options=[
+                "Monthly elective surgical site infections during initial chlorhexidine QI bundle rollout (N=24 months)",
+                "Emergency department door-to-needle thrombolysis time for individual stroke admissions (minutes)",
+                "Hospital-wide 4-hour A&E access breach proportions with very large patient volumes (n > 5,000/month)",
+                "Ward catheter-associated urinary tract infection (CAUTI) rates per 1,000 catheter-days with variable occupancy",
+                "Elective day-case surgery rate evaluated against 85% national target for trust board assurance"
+            ],
+            key="spc_tree_scenario_select"
+        )
+    with c2:
+        spc_setting = st.selectbox(
+            "Primary analytical requirement & mathematical model:",
+            options=[
+                "Baseline median with Shift (>=6 pts), Trend (>=5 pts) and Runs count verification",
+                "Continuous individual measures with moving range (k=2) and 3-sigma limits",
+                "Binomial proportion with Laney sigma_z overdispersion expansion for large subgroups",
+                "Poisson infection count per 1,000 exposure units with Laney overdispersion adjustment",
+                "Executive dual-icon system (Variation + Target Assurance) with Cp and Cpk capability"
+            ],
+            key="spc_tree_setting_select"
+        )
+
+    spc_routing = {
+        "Monthly elective surgical site infections during initial chlorhexidine QI bundle rollout (N=24 months)": (
+            "run_chart",
+            "Healthcare Run Chart",
+            "Non-Parametric Median & 4 Detection Rules"
+        ),
+        "Emergency department door-to-needle thrombolysis time for individual stroke admissions (minutes)": (
+            "xmr_chart",
+            "Shewhart XmR / I-MR Chart",
+            "Individual Continuous Measures & Moving Range Limits"
+        ),
+        "Hospital-wide 4-hour A&E access breach proportions with very large patient volumes (n > 5,000/month)": (
+            "p_chart",
+            "Laney p' & Standard p-Chart",
+            "Binomial Proportions with Overdispersion sigma_z Correction"
+        ),
+        "Ward catheter-associated urinary tract infection (CAUTI) rates per 1,000 catheter-days with variable occupancy": (
+            "u_chart",
+            "Laney u' & Standard u-Chart",
+            "Poisson Infection Rates per 1,000 Bed-Days"
+        ),
+        "Elective day-case surgery rate evaluated against 85% national target for trust board assurance": (
+            "making_data_count",
+            "NHS Making Data Count & Capability Analysis",
+            "System Icons (Variation/Assurance) & Process Capability (Cp, Cpk)"
+        )
+    }
+
+    skey, sname, stier = spc_routing.get(
+        spc_scenario,
+        ("run_chart", "Healthcare Run Chart", "Quality Improvement Surveillance")
+    )
+
+    st.success(f"🎯 **Recommended Method:** `{sname}` — *{stier}*")
+    col_jump, _ = st.columns([1.5, 2.5])
+    with col_jump:
+        if st.button(f"Launch {sname} on Page 9 👉", key=f"btn_jump_spc_{skey}", use_container_width=True):
+            st.session_state["spc_direct_method_key"] = skey
+            st.session_state["spc_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.switch_page("pages/9_📈_Statistical_Process_Control_and_Quality_Improvement.py")
+
+
+# =====================================================================
+# 9. Health Economics & Health Technology Assessment (HTA / NICE) Tree
+# =====================================================================
+
+def render_hta_decision_tree() -> None:
+    """Renders the comprehensive Health Economics & Health Technology Assessment (HTA / NICE)
+    decision tree covering all 5 architectures.
+    """
+    st.markdown("### 💷 Health Economics & Health Technology Assessment (HTA / NICE) Decision Tree (5 Architectures)")
+    st.markdown(r"""
+    This decision tree guides health economists, market access teams, and NHS commissioners from 
+    **Appraisal Scope & Decision Objective** (Cost-Effectiveness vs Payer Affordability) 
+    through **Disease Progression Dynamics & Parameter Uncertainty Audits** 
+    (Trial-Based ICERs, Markov State-Transition Matrices, Multi-Arm NMB Rankings, and Monte Carlo PSA) 
+    to the mathematically and regulatorily justified health economic model.
+    """)
+
+    mermaid_code = """```mermaid
+flowchart TD
+    HTAStart(["Health Economic & Policy Question"]) --> HTAGoal{"What is the Primary Evaluation Objective?"}
+
+    %% 1. Efficiency vs Affordability
+    HTAGoal -->|"Long-Term Economic Efficiency (Value for Money / QALY)"| CompDesign{"How Many Competing Strategies Are Being Compared?"}
+    CompDesign -->|"Two Strategies (Novel Intervention vs Current Standard)"| DiseaseNat{"Is the Condition an Acute Event or Chronic Progressive State?"}
+    DiseaseNat -->|"Acute / Fixed Horizon (Trial-Based Assessment)"| M1["1. ICER & Cost-Effectiveness Plane<br/>• Incremental Cost ΔC and Health Gain ΔQALY<br/>• 4-Quadrant Placement (Dominant, Dominated, Trade-off)<br/>• Evaluated against NICE £20,000–£30,000 / QALY threshold"]
+    DiseaseNat -->|"Chronic Progressive Disease (Recurrent Events, Remissions)"| M3["3. Markov Cohort State-Transition Model<br/>• Multi-state matrix transitions (Well, Progression, Dead)<br/>• Half-cycle correction (trapezoidal rule)<br/>• 3.5% NICE annual discounting on costs and QALYs"]
+
+    CompDesign -->|"Three or More Competing Active Strategies"| M2["2. Net Monetary Benefit (NMB) & NHB<br/>• Linear value transformation: NMB = λ * ΔE - ΔC<br/>• Eliminates ratio instability and negative denominator traps<br/>• Direct ranking: Select strategy that maximizes NMB"]
+
+    %% 2. Parameter Uncertainty
+    HTAGoal -->|"Quantifying Decision Uncertainty & Probability of Error"| M4["4. Probabilistic Sensitivity Analysis (PSA)<br/>• Monte Carlo sampling across parameter distributions<br/>• Gamma for skewed costs, Beta for health utilities (0-1)<br/>• Cost-Effectiveness Acceptability Curves (CEAC) & EVPI"]
+
+    %% 3. Budget Impact / Affordability
+    HTAGoal -->|"Short-Term Financial Affordability for Payer (1 to 5 Years)"| M5["5. Budget Impact Analysis (BIA)<br/>• Target eligible patient epidemiology and diagnosis cascade<br/>• Dynamic market uptake penetration trajectories<br/>• Gross pharmacy expenditure minus hospital bed-day offsets<br/>• Evaluated against the NHS £20m Budget Impact Test"]
+
+    classDef ce fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af;
+    classDef nmb fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#166534;
+    classDef markov fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#854d0e;
+    classDef psa fill:#faf5ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
+    classDef bia fill:#fff1f2,stroke:#e11d48,stroke-width:2px,color:#9f1239;
+    classDef decision fill:#f8fafc,stroke:#475569,stroke-width:1.5px,color:#0f172a;
+
+    class M1 ce;
+    class M2 nmb;
+    class M3 markov;
+    class M4 psa;
+    class M5 bia;
+    class HTAStart,HTAGoal,CompDesign,DiseaseNat decision;
+```"""
+    st.markdown(mermaid_code)
+
+    # Triage Principles Container
+    with st.expander("💡 Health Economics & HTA Principles: QALYs, NICE Thresholds & Opportunity Costs", expanded=False):
+        hta_rules_html = r"""
+        <div style="background-color: #f8fafc; border-left: 4px solid #ca8a04; padding: 0.85rem 1.1rem; border-radius: 4px; font-size: 0.88rem; line-height: 1.5; color: #1e293b;">
+            <div style="font-weight: 700; color: #854d0e; margin-bottom: 0.35rem;">
+                💷 Core Principles for Health Technology Assessment & Economic Modeling
+            </div>
+            • <strong>Opportunity Cost in Fixed-Budget Healthcare:</strong> Public healthcare providers (NHS) cannot create additional funding out of thin air. Reimbursing a costly drug displaces existing NHS services. The NICE cost-effectiveness threshold (£20,000–£30,000 / QALY) reflects the marginal productivity of the NHS.<br>
+            • <strong>Cost-Effectiveness vs Budget Impact:</strong> Cost-Effectiveness Analysis evaluates long-term efficiency across a patient's entire lifetime (cost per QALY gained with 3.5% discounting). Budget Impact Analysis evaluates immediate cash-flow affordability for local commissioners over a 1-to-5 year operational horizon.<br>
+            • <strong>The Net Monetary Benefit (NMB) Solution:</strong> When ranking 3 or more competing clinical regimens, pairwise ICERs become prone to ratio instability and extended dominance. Transforming outcomes into NMB ($\lambda \cdot \Delta E - \Delta C$) provides a linear scale where the highest NMB unambiguously represents the optimal clinical strategy.<br>
+            • <strong>Markov Cohort Modeling & Half-Cycle Correction:</strong> Chronic disease modeling requires tracking cohorts across discrete health states (e.g. Progression-Free, Progressed Disease, Death). Half-cycle corrections (averaging start and end of cycle state distributions) prevent over- or under-estimating outcomes.<br>
+            • <strong>Probabilistic Sensitivity Analysis (PSA):</strong> Deterministic point estimates do not capture real-world uncertainty. PSA assigns statistical distributions to all parameters (Gamma for costs, Beta for health utilities) to produce Cost-Effectiveness Acceptability Curves (CEAC) for committee decision-making.
+        </div>
+        """
+        render_html(hta_rules_html)
+
+    # Interactive Method Selector
+    st.markdown("#### ⚡ Quick Health Economics & HTA Method Selector")
+    c1, c2 = st.columns(2)
+    with c1:
+        hta_scenario = st.selectbox(
+            "What is your health technology assessment scenario?",
+            options=[
+                "Biologic DMARD vs standard care in severe rheumatoid arthritis (Incremental cost per QALY)",
+                "Heart failure multi-arm comparison ranking 3 active treatments (ACEi vs ARNI vs SGLT2i)",
+                "10-year oncology survival trace with progression-free and metastatic health states (3.5% discounting)",
+                "Minimally invasive heart valve implant with parameter uncertainty across 1,000 Monte Carlo iterations",
+                "NHS England 5-year financial impact for 250,000 eligible chronic kidney disease patients"
+            ],
+            key="hta_tree_scenario_select"
+        )
+    with c2:
+        hta_setting = st.selectbox(
+            "Primary analytical requirement & mathematical framework:",
+            options=[
+                "Pairwise ICER calculation (£/QALY) on 4-quadrant Cost-Effectiveness Plane",
+                "Linear Net Monetary Benefit (NMB) ranking across multiple competing strategies",
+                "Multi-state Markov matrix simulation with half-cycle correction & NICE discounting",
+                "Monte Carlo PSA parameter sampling with Cost-Effectiveness Acceptability Curves (CEAC)",
+                "5-year undiscounted budget impact forecasting with hospitalization bed-day offsets"
+            ],
+            key="hta_tree_setting_select"
+        )
+
+    hta_routing = {
+        "Biologic DMARD vs standard care in severe rheumatoid arthritis (Incremental cost per QALY)": (
+            "icer_plane",
+            "Cost-Effectiveness & ICER Plane",
+            "Pairwise Value for Money & Threshold Appraisal"
+        ),
+        "Heart failure multi-arm comparison ranking 3 active treatments (ACEi vs ARNI vs SGLT2i)": (
+            "nmb_nhb",
+            "Net Monetary Benefit (NMB) & NHB",
+            "Linear Value Metric & Multi-Strategy Ranking"
+        ),
+        "10-year oncology survival trace with progression-free and metastatic health states (3.5% discounting)": (
+            "markov_model",
+            "Markov Decision Analytic Cohort Model",
+            "Longitudinal Chronic Disease State Transitions"
+        ),
+        "Minimally invasive heart valve implant with parameter uncertainty across 1,000 Monte Carlo iterations": (
+            "psa_ceac",
+            "Probabilistic Sensitivity Analysis (PSA) & CEAC",
+            "Decision Risk & Uncertainty Modeling"
+        ),
+        "NHS England 5-year financial impact for 250,000 eligible chronic kidney disease patients": (
+            "budget_impact",
+            "Budget Impact Analysis (BIA)",
+            "5-Year Payer Financial Feasibility & Affordability"
+        )
+    }
+
+    hkey, hname, htier = hta_routing.get(
+        hta_scenario,
+        ("icer_plane", "Cost-Effectiveness & ICER Plane", "Health Economics Evaluation")
+    )
+
+    st.success(f"🎯 **Recommended Method:** `{hname}` — *{htier}*")
+    col_jump, _ = st.columns([1.5, 2.5])
+    with col_jump:
+        if st.button(f"Launch {hname} on Page 10 👉", key=f"btn_jump_hta_{hkey}", use_container_width=True):
+            st.session_state["hta_direct_method_key"] = hkey
+            st.session_state["hta_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.switch_page("pages/10_💷_Health_Economics_and_HTA.py")
+
+
+
+# =====================================================================
+# 10. Missing Data Mechanisms, Imputation & Sensitivity Audits Tree
+# =====================================================================
+
+def render_missing_data_decision_tree() -> None:
+    """Renders the comprehensive Missing Data Mechanisms, Imputation & Sensitivity Audits
+    decision tree covering all 5 architectures.
+    """
+    st.markdown("### 🧩 Missing Data Mechanisms, Imputation & Sensitivity Audits Decision Tree (5 Architectures)")
+    st.markdown(r"""
+    This decision tree guides clinical trialists, biostatisticians, and epidemiologists from 
+    **Missingness Mechanism Diagnosis** (MCAR vs MAR vs MNAR) through **Imputation Strategy Selection** 
+    (Complete Case retention decay, Single Imputation variance collapse, Multiple Imputation by Chained Equations with Rubin's Pooling, and Algorithmic $k$-NN / MissForest) 
+    to **Regulatory Sensitivity Audits** (ICH E9 R1 Addendum Tipping Point Analysis).
+    """)
+
+    mermaid_code = """```mermaid
+flowchart TD
+    MissStart(["Incomplete Dataset or Clinical Dropout Pattern"]) --> MechAudit{"What is the Diagnosed or Plausible Missingness Mechanism?"}
+
+    %% 1. MCAR Path
+    MechAudit -->|"Missing Completely at Random (MCAR)"| LittleCheck{"Is Missing Fraction < 5% on Uncorrelated Covariates?"}
+    LittleCheck -->|"Yes: Negligible Loss (< 5%)"| M2["2. Complete Case Analysis & Single Imputation Hazards<br/>• Listwise deletion unbiased under strict MCAR<br/>• Danger: (1-p)^K multi-variable retention collapse<br/>• Mean/LOCF imputation strictly censured due to variance deflation"]
+    LittleCheck -->|"No: Substantial Missingness or Formal Test Required"| M1["1. Rubin's Taxonomy & Diagnostic Audits<br/>• Little's Multivariate MCAR Test (d^2 ~ Chi-Square)<br/>• Missingness indicators R_i & logistic dropout modeling<br/>• Missing data pattern matrix & retention audit"]
+
+    %% 2. MAR Path
+    MechAudit -->|"Missing at Random (MAR: Conditional on Observed Covariates)"| ModelType{"What is the Analytical Objective & Data Structure?"}
+    ModelType -->|"Parametric Inference / Regression with Rubin's Pooling"| M3["3. MICE & Rubin's Rules Pooling<br/>• Fully Conditional Specification (FCS / PMM)<br/>• Generate m completed datasets (m >= 20)<br/>• Rubin's Rules: Q_bar, U_bar, B, Total Variance T, FMI, RIV, df"]
+    ModelType -->|"Non-Parametric / High-Dimensional Non-Linear Interactions"| M4["4. Algorithmic k-NN & MissForest Imputation<br/>• Gower distance k-nearest neighbors donor matching<br/>• Iterative non-parametric Random Forest (MissForest)<br/>• Preserves complex multi-way non-linear interactions"]
+
+    %% 3. MNAR Path
+    MechAudit -->|"Missing Not at Random (MNAR: Informative Dropout)"| M5["5. MNAR Pattern-Mixture & Tipping Point Analysis<br/>• Mandated by ICH E9 (R1) Addendum on Estimands<br/>• Pattern-mixture delta-adjustment penalty on dropouts<br/>• Systematic tipping point search delta* where significance flips (p >= 0.05)"]
+
+    classDef diag fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e40af;
+    classDef cca fill:#fef2f2,stroke:#ef4444,stroke-width:2px,color:#991b1b;
+    classDef mice fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#166534;
+    classDef ml fill:#faf5ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
+    classDef tipping fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#854d0e;
+    classDef decision fill:#f8fafc,stroke:#475569,stroke-width:1.5px,color:#0f172a;
+
+    class M1 diag;
+    class M2 cca;
+    class M3 mice;
+    class M4 ml;
+    class M5 tipping;
+    class MissStart,MechAudit,LittleCheck,ModelType decision;
+```"""
+    st.markdown(mermaid_code)
+
+    # Triage Principles Container
+    with st.expander("💡 Missing Data Principles: Rubin's Taxonomy, Variance Collapse & ICH E9 Compliance", expanded=False):
+        missing_rules_html = r"""
+        <div style="background-color: #f8fafc; border-left: 4px solid #7c3aed; padding: 0.85rem 1.1rem; border-radius: 4px; font-size: 0.88rem; line-height: 1.5; color: #1e293b;">
+            <div style="font-weight: 700; color: #5b21b6; margin-bottom: 0.35rem;">
+                🧩 Core Principles for Missing Data Mechanisms & Principled Imputation
+            </div>
+            • <strong>Rubin's Taxonomy (MCAR vs. MAR vs. MNAR):</strong> Under MCAR, missingness is completely independent of both observed and unobserved data. Under MAR, missingness depends on observed covariates (e.g. older patients skip tests, but conditioned on age, missingness is random). Under MNAR, missingness depends on unobserved values (e.g. patients with severe depressive relapse refuse questionnaires).<br>
+            • <strong>The Lethal Hazard of Single Mean Imputation:</strong> Replacing missing values with the sample mean falsely deflates sample variance by $(1-\pi)$, artificially shrivels standard errors by $\sqrt{1-\pi}$, and inflates Type I errors (manufacturing false-positive trial results). Last Observation Carried Forward (LOCF) is banned by regulators because it unrealistically assumes zero trajectory drift.<br>
+            • <strong>Why Multiple Imputation (MICE) is the Scientific Standard:</strong> MICE generates $m$ complete datasets using chained conditional regression models. Rubin's Rules explicitly calculate between-imputation variance $B$ to add back the honest uncertainty caused by missing values into the total variance $T = \bar{U} + (1 + 1/m)B$.<br>
+            • <strong>Algorithmic Imputation (k-NN & MissForest):</strong> When relationships are non-linear or feature high-order interactions, parametric regressions in MICE can be misspecified. $k$-NN with Gower distance and MissForest (iterative random forest) capture non-parametric topology without distribution assumptions.<br>
+            • <strong>ICH E9 (R1) Mandate & Tipping Point Audits:</strong> Because MAR is fundamentally untestable from observed data alone, international regulators mandate tipping point sensitivity analysis. By applying a systematic clinical penalty $\delta$ exclusively to dropouts, we identify the exact threshold $\delta^*$ where trial significance flips ($p \ge 0.05$).
+        </div>
+        """
+        render_html(missing_rules_html)
+
+    # Interactive Method Selector
+    st.markdown("#### ⚡ Quick Missing Data & Imputation Method Selector")
+    c1, c2 = st.columns(2)
+    with c1:
+        missing_scenario = st.selectbox(
+            "What is your clinical or observational missing data scenario?",
+            options=[
+                "ICU sepsis registry with 15% missing arterial lactate; testing whether missingness is independent of severity (Little's test)",
+                "Cardiovascular cohort evaluating power loss from listwise deletion vs variance shrinkage from mean imputation & LOCF",
+                "Multicenter diabetes RCT evaluating HbA1c reduction across covariates with 20% MAR missingness (MICE & Rubin's rules)",
+                "Complex EHR registry with non-linear biomarker interactions and mixed categorical/continuous labs (k-NN / MissForest)",
+                "Phase III depression RCT evaluating drug vs placebo where dropouts may have experienced worse symptom relapse (ICH E9 tipping point)"
+            ],
+            key="missing_tree_scenario_select"
+        )
+    with c2:
+        missing_setting = st.selectbox(
+            "Primary analytical requirement & mathematical framework:",
+            options=[
+                "Multivariate Little's d^2 MCAR test, pattern matrix, and logistic missingness indicator modeling",
+                "Quantifying listwise retention collapse (1-p)^K and variance shrinkage factor (1-pi)",
+                "Chained equations (MICE / PMM) generating m datasets and pooling via Rubin's Rules (Q_bar, U_bar, B, T, FMI)",
+                "Non-parametric Gower distance k-NN donor matching or iterative Random Forest (MissForest)",
+                "Pattern-mixture delta-adjustment sensitivity audit locating regulatory tipping point delta* (p >= 0.05)"
+            ],
+            key="missing_tree_setting_select"
+        )
+
+    missing_routing = {
+        "ICU sepsis registry with 15% missing arterial lactate; testing whether missingness is independent of severity (Little's test)": (
+            "rubin_taxonomy",
+            "Rubin's Taxonomy & Diagnostic Audits",
+            "Little's MCAR Test & Missingness Pattern Diagnostics"
+        ),
+        "Cardiovascular cohort evaluating power loss from listwise deletion vs variance shrinkage from mean imputation & LOCF": (
+            "complete_case_vs_single",
+            "Complete Case Analysis vs. Single Imputation Hazards",
+            "Listwise Retention Collapse & Variance Shrinkage Audits"
+        ),
+        "Multicenter diabetes RCT evaluating HbA1c reduction across covariates with 20% MAR missingness (MICE & Rubin's rules)": (
+            "mice_rubin_rules",
+            "MICE & Rubin's Rules Pooling",
+            "Principled Multiple Imputation & Variance Decomposition"
+        ),
+        "Complex EHR registry with non-linear biomarker interactions and mixed categorical/continuous labs (k-NN / MissForest)": (
+            "knn_missforest",
+            "Algorithmic & Distance-Based Imputation",
+            "k-NN Donor Matching & MissForest Ensemble"
+        ),
+        "Phase III depression RCT evaluating drug vs placebo where dropouts may have experienced worse symptom relapse (ICH E9 tipping point)": (
+            "mnar_tipping_point",
+            "MNAR Tipping Point Sensitivity Analysis",
+            "ICH E9 (R1) Pattern-Mixture Delta-Adjustment Audit"
+        )
+    }
+
+    mkey, mname, mtier = missing_routing.get(
+        missing_scenario,
+        ("rubin_taxonomy", "Rubin's Taxonomy & Diagnostic Audits", "Diagnostic & Theoretical Foundations")
+    )
+
+    st.success(f"🎯 **Recommended Method:** `{mname}` — *{mtier}*")
+    col_jump, _ = st.columns([1.5, 2.5])
+    with col_jump:
+        if st.button(f"Launch {mname} on Page 11 👉", key=f"btn_jump_missing_{mkey}", use_container_width=True):
+            st.session_state["missing_direct_method_key"] = mkey
+            st.session_state["missing_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.switch_page("pages/11_🧩_Missing_Data_and_Imputation.py")
+
+
+
+# =====================================================================
+# 11. Longitudinal & Hierarchical Mixed-Effects Models Tree
+# =====================================================================
+
+def render_mixed_models_decision_tree() -> None:
+    """Renders the comprehensive Longitudinal & Hierarchical Mixed-Effects Models
+    decision tree covering all 5 architectures.
+    """
+    st.markdown("### 🪜 Longitudinal & Hierarchical Mixed-Effects Models Decision Tree (5 Architectures)")
+    st.markdown(r"""
+    This decision tree guides clinical trialists, biostatisticians, and healthcare data scientists from 
+    **Data Structure & Outcome Scale** (Continuous vs Binary/Count) through **Clustering Hierarchy** 
+    (Repeated Patient Measures vs 3-Level Organizational Nesting) to **Covariance Modeling & Goodness-of-Fit** 
+    (Laird & Ware LMM, GLMM non-collapsibility, RM-ANOVA sphericity recovery, and Nakagawa $R^2$).
+    """)
+
+    mermaid_code = """```mermaid
+flowchart TD
+    MixedStart(["Longitudinal Repeated Measures or Multi-Tier Clustered Cohort"]) --> DataOutcome{"What is the Mathematical Form of the Outcome Variable?"}
+
+    %% 1. Continuous Outcome
+    DataOutcome -->|"Continuous Metric (e.g. ADAS-Cog, Blood Pressure)"| TierCheck{"What is the Clustered Organizational Structure?"}
+    TierCheck -->|"2 Levels: Repeated Patient Follow-up Visits (Level 1 in Level 2)"| SlopeCheck{"Do Patients Differ Only at Baseline or Also in Recovery Speed?"}
+    SlopeCheck -->|"Baseline Level Only"| M1a["1. LMM Random Intercept Model<br/>• Common population slope beta_time<br/>• Personalized starting baseline u_0i<br/>• Intraclass Correlation Coefficient (ICC)"]
+    SlopeCheck -->|"Both Baseline & Rate of Change"| M1b["1. LMM Random Intercept + Slope Model<br/>• Laird & Ware formulation (Y_i = X_i*beta + Z_i*u_i + e_i)<br/>• Personalized trajectory slope u_1i * t<br/>• Empirical Bayes shrinkage estimates (BLUPs)"]
+
+    TierCheck -->|"3+ Levels: Patients in Clinicians in Hospital Trusts"| M4["4. Hierarchical 3-Level Clustered Models<br/>• Additive variance decomposition (hosp + clin + error)<br/>• Variance Partition Coefficients (VPC_hosp, VPC_clin)<br/>• Contextual within-between neighborhood effects"]
+
+    %% 2. Discrete / Non-Normal
+    DataOutcome -->|"Binary Relapse (0/1) or Poisson Infection Counts"| M2["2. Generalized Linear Mixed Models (GLMM)<br/>• Logistic mixed regression (Logit link) & Poisson mixed (Log link)<br/>• Subject-Specific OR vs Marginal Population-Averaged OR<br/>• Non-collapsibility attenuation gap audit"]
+
+    %% 3. Classical Comparison
+    DataOutcome -->|"Evaluating Legacy Repeated Measures ANOVA vs LMM"| M3["3. RM-ANOVA vs. LMM Sphericity Tradeoff<br/>• Mauchly's sphericity test & Greenhouse-Geisser epsilon penalty<br/>• Listwise deletion penalty (devastating power loss)<br/>• LMM retains 100% of enrolled patients under MAR likelihood"]
+
+    %% 4. Model Diagnostics & R2
+    DataOutcome -->|"Residual Covariance Selection & Effect Size Reporting"| M5["5. Covariance Selection & Nakagawa R²<br/>• Maximum Likelihood (ML) vs REML unbiased estimation<br/>• Compound Symmetry vs Autoregressive AR(1) error decay<br/>• Nakagawa Marginal R²_m & Conditional R²_c metrics"]
+
+    classDef lmm fill:#eef2ff,stroke:#4f46e5,stroke-width:2px,color:#312e81;
+    classDef glmm fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#166534;
+    classDef rmanova fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#854d0e;
+    classDef h3 fill:#faf5ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8;
+    classDef diag fill:#f0f9ff,stroke:#0284c7,stroke-width:2px,color:#0369a1;
+    classDef decision fill:#f8fafc,stroke:#475569,stroke-width:1.5px,color:#0f172a;
+
+    class M1a,M1b lmm;
+    class M2 glmm;
+    class M3 rmanova;
+    class M4 h3;
+    class M5 diag;
+    class MixedStart,DataOutcome,TierCheck,SlopeCheck decision;
+```"""
+    st.markdown(mermaid_code)
+
+    # Triage Principles Container
+    with st.expander("💡 Longitudinal & Mixed Model Principles: Sphericity, Non-Collapsibility & VPC", expanded=False):
+        mixed_rules_html = r"""
+        <div style="background-color: #f8fafc; border-left: 4px solid #4f46e5; padding: 0.85rem 1.1rem; border-radius: 4px; font-size: 0.88rem; line-height: 1.5; color: #1e293b;">
+            <div style="font-weight: 700; color: #3730a3; margin-bottom: 0.35rem;">
+                🪜 Core Principles for Longitudinal & Hierarchical Mixed Modeling
+            </div>
+            • <strong>Fixed Effects vs. Random Effects:</strong> Fixed effects represent the overarching population-average trend (e.g. drug effect across the whole trial). Random effects model individual subject personalities, allowing every patient to have their own unique baseline starting point ($u_{0i}$) and rate of recovery ($u_{1i}$).<br>
+            • <strong>Why Mixed Models Crush Repeated Measures ANOVA:</strong> Classical RM-ANOVA uses listwise deletion: a patient missing 1 checkup has ALL visits thrown away. Linear Mixed Models (LMM) use full-information likelihood to retain 100% of participants, properly handling missing visits at random (MAR) and continuous, irregular follow-up times.<br>
+            • <strong>The Non-Collapsibility Gap in GLMM:</strong> In logistic mixed models, the subject-specific conditional odds ratio ($	ext{OR}_{	ext{SS}}$) is always systematically larger in magnitude than the population-averaged marginal odds ratio ($	ext{OR}_{	ext{marginal}}$) due to non-collapsibility of the logit link.<br>
+            • <strong>Multilevel Variance Partition Coefficients (VPC):</strong> In 3-level healthcare data (patients in surgeons in hospital trusts), VPC decomposes total variation into percentages attributable to hospital trust policies, surgeon skill, and patient biology.<br>
+            • <strong>Nakagawa & Schielzeth (2013) R² Metrics:</strong> Standard $R^2$ is undefined in mixed models. Report Marginal $R^2_m$ (variance explained purely by fixed treatments) alongside Conditional $R^2_c$ (variance explained by both fixed treatments and patient random baselines).
+        </div>
+        """
+        render_html(mixed_rules_html)
+
+    # Interactive Method Selector
+    st.markdown("#### ⚡ Quick Longitudinal & Multilevel Method Selector")
+    c1, c2 = st.columns(2)
+    with c1:
+        mixed_scenario = st.selectbox(
+            "What is your longitudinal or hierarchical research scenario?",
+            options=[
+                "Alzheimer's trial with 4 annual visits; patients start at different severities and decline at different speeds",
+                "ICU sepsis monitoring evaluating repeated binary organ failure relapse (0/1) across hospital wards",
+                "Physiotherapy chronic pain trial with 20% missed appointment visits and sphericity breakdown (p < 0.001)",
+                "NHS surgical audit evaluating recovery times across patients nested within 120 surgeons across 25 Hospital Trusts",
+                "Serial troponin biomarker draws over 72 hours; selecting between Compound Symmetry and AR(1) error decay"
+            ],
+            key="mixed_tree_scenario_select"
+        )
+    with c2:
+        mixed_setting = st.selectbox(
+            "Primary analytical requirement & mathematical framework:",
+            options=[
+                "Laird & Ware LMM with random intercepts and personalized random slopes (ADAS-Cog trajectory)",
+                "Generalized Linear Mixed Model (GLMM) mixed logistic regression with subject-specific vs marginal OR",
+                "Evaluating Mauchly's sphericity, Greenhouse-Geisser epsilon, and LMM 100% MAR patient retention",
+                "3-level hierarchical variance decomposition (VPC_hosp, VPC_clin, VPC_error) and contextual effects",
+                "Covariance model selection (VC, CS, AR1, UN) via AIC/BIC and Nakagawa marginal/conditional R^2"
+            ],
+            key="mixed_tree_setting_select"
+        )
+
+    mixed_routing = {
+        "Alzheimer's trial with 4 annual visits; patients start at different severities and decline at different speeds": (
+            "lmm_random_slopes",
+            "Linear Mixed-Effects Models (LMM)",
+            "Random Intercepts & Personalized Trajectory Slopes"
+        ),
+        "ICU sepsis monitoring evaluating repeated binary organ failure relapse (0/1) across hospital wards": (
+            "glmm_binary_count",
+            "Generalized Linear Mixed Models (GLMM)",
+            "Repeated Binary Relapse & Count Outcomes"
+        ),
+        "Physiotherapy chronic pain trial with 20% missed appointment visits and sphericity breakdown (p < 0.001)": (
+            "rm_anova_vs_lmm",
+            "RM-ANOVA vs. Mixed Models Tradeoff",
+            "Sphericity Violations & Missing Data Likelihood Recovery"
+        ),
+        "NHS surgical audit evaluating recovery times across patients nested within 120 surgeons across 25 Hospital Trusts": (
+            "hierarchical_3level",
+            "Hierarchical 3-Level Clustered Models",
+            "Multilevel Organizational Variance Partitioning (VPC)"
+        ),
+        "Serial troponin biomarker draws over 72 hours; selecting between Compound Symmetry and AR(1) error decay": (
+            "covariance_model_selection",
+            "Covariance Structure Selection & Diagnostics",
+            "AR(1) Error Decay, ML vs. REML, and Nakagawa R^2 Metrics"
+        )
+    }
+
+    mkey, mname, mtier = mixed_routing.get(
+        mixed_scenario,
+        ("lmm_random_slopes", "Linear Mixed-Effects Models (LMM)", "Continuous Repeated Measures")
+    )
+
+    st.success(f"🎯 **Recommended Method:** `{mname}` — *{mtier}*")
+    col_jump, _ = st.columns([1.5, 2.5])
+    with col_jump:
+        if st.button(f"Launch {mname} on Page 12 👉", key=f"btn_jump_mixed_{mkey}", use_container_width=True):
+            st.session_state["mixed_direct_method_key"] = mkey
+            st.session_state["mixed_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.switch_page("pages/12_🪜_Longitudinal_and_Mixed_Models.py")

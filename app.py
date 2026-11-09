@@ -12,6 +12,15 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from src.stats_calcs.decision_schema import STATISTICAL_TESTS
+from src.ml_models.ml_schema import ML_MODELS
+from src.survey_analysis.survey_schema import SURVEY_METHODS
+from src.nlp.nlp_schema import NLP_METHODS
+from src.time_series.ts_engine import TIME_SERIES_ALGORITHMS
+from src.causal_inference.causal_schema import CAUSAL_METHODS
+from src.spc_qi.spc_schema import SPC_METHODS
+from src.health_economics.hta_schema import HTA_METHODS
+from src.missing_data.missing_schema import MISSING_DATA_METHODS
+from src.mixed_models.mixed_schema import MIXED_MODELS_METHODS
 from src.ui_components.sidebar_navigation import render_custom_sidebar_navigation
 
 EPI_QUICK_METHODS = {
@@ -86,13 +95,13 @@ col_hub1, col_hub2, col_hub3 = st.columns(3)
 with col_hub1:
     st.page_link("pages/0_📚_Statistical_Fundamentals.py", label="Statistical Fundamentals & Baseline Concepts 📚", icon="📚")
 with col_hub2:
-    st.page_link("pages/8_🎯_Study_Design_and_Method_Selector.py", label="Universal Study Design Selector 🎯", icon="🎯")
+    st.page_link("pages/13_🎯_Study_Design_and_Method_Selector.py", label="Universal Study Design Selector 🎯", icon="🎯")
 with col_hub3:
-    st.page_link("pages/9_🗺️_Decision_Flowcharts.py", label="Methodology Decision Flowcharts 🗺️", icon="🗺️")
+    st.page_link("pages/14_🗺️_Decision_Flowcharts.py", label="Methodology Decision Flowcharts 🗺️", icon="🗺️")
 
 st.markdown("---")
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3 = st.columns(3)
 
 with col1:
     st.markdown("""
@@ -153,6 +162,36 @@ with col2:
 
 with col3:
     st.markdown("""
+    ### 🤖 Machine Learning
+    **Status:** 🟢 **Active (16 Architectures)**
+    
+    Predictive modeling & operational analytics:
+    - Supervised classification (PR-AUC, calibrated probabilities, rare 8% readmissions)
+    - Operational demand & bed surge forecasting (Holt-Winters triple smoothing, SARIMA)
+    - Health equity & algorithmic fairness audits (Four-Fifths 80% Rule across IMD deciles)
+    - Dynamic classification threshold tuning (Precision vs. Sensitivity tradeoffs)
+    - Unsupervised patient phenotyping & PCA scree variance extraction
+    """)
+    st.page_link("pages/3_🤖_Machine_Learning.py", label="Open Machine Learning & Forecasting 🤖", icon="🤖")
+
+    with st.expander("⚡ Quick Jump to Method", expanded=False):
+        selected_ml_quick = st.selectbox(
+            "Select method to explore directly:",
+            options=list(ML_MODELS.keys()),
+            format_func=lambda k: ML_MODELS[k]["name"],
+            key="home_quick_ml_select"
+        )
+        if st.button("Explore This Method 👉", key="btn_quick_ml_explore"):
+            st.session_state["ml_nav_mode"] = "direct"
+            st.session_state["ml_direct_model_key"] = selected_ml_quick
+            st.switch_page("pages/3_🤖_Machine_Learning.py")
+
+st.markdown("---")
+
+col_row2_1, col_row2_2, col_row2_3 = st.columns(3)
+
+with col_row2_1:
+    st.markdown("""
     ### 📐 Sample Size & Power
     **Status:** 🟢 **Active (10 Frameworks)**
     
@@ -167,25 +206,7 @@ with col3:
     """)
     st.page_link("pages/4_📐_Sample_Size_and_Power.py", label="Open Sample Size & Power 📐", icon="📐")
 
-with col4:
-    st.markdown("""
-    ### 🤖 Machine Learning
-    **Status:** 🟢 **Active (16 Architectures)**
-    
-    Predictive modeling & operational analytics:
-    - Supervised classification (PR-AUC, calibrated probabilities, rare 8% readmissions)
-    - Operational demand & bed surge forecasting (Holt-Winters triple smoothing, SARIMA)
-    - Health equity & algorithmic fairness audits (Four-Fifths 80% Rule across IMD deciles)
-    - Dynamic classification threshold tuning (Precision vs. Sensitivity tradeoffs)
-    - Unsupervised patient phenotyping & PCA scree variance extraction
-    """)
-    st.page_link("pages/3_🤖_Machine_Learning.py", label="Open Machine Learning & Forecasting 🤖", icon="🤖")
-
-st.markdown("---")
-
-col_row2_1, col_row2_2, col_row2_3 = st.columns(3)
-
-with col_row2_1:
+with col_row2_2:
     st.markdown("""
     ### 📋 Survey & Questionnaire Analysis
     **Status:** 🟢 **Active (7 Methods)**
@@ -199,7 +220,19 @@ with col_row2_1:
     """)
     st.page_link("pages/5_📋_Survey_and_Questionnaire_Analysis.py", label="Open Survey & Questionnaire Analysis 📋", icon="📋")
 
-with col_row2_2:
+    with st.expander("⚡ Quick Jump to Method", expanded=False):
+        selected_survey_quick = st.selectbox(
+            "Select method to explore directly:",
+            options=list(SURVEY_METHODS.keys()),
+            format_func=lambda k: f"{SURVEY_METHODS[k]['icon']} {SURVEY_METHODS[k]['name']}",
+            key="home_quick_survey_select"
+        )
+        if st.button("Explore This Method 👉", key="btn_quick_survey_explore"):
+            st.session_state["survey_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.session_state["survey_direct_method_key"] = selected_survey_quick
+            st.switch_page("pages/5_📋_Survey_and_Questionnaire_Analysis.py")
+
+with col_row2_3:
     st.markdown("""
     ### 🗣️ Natural Language Processing
     **Status:** 🟢 **Active (7 Methods)**
@@ -213,7 +246,24 @@ with col_row2_2:
     """)
     st.page_link("pages/6_🗣️_Natural_Language_Processing.py", label="Open Natural Language Processing 🗣️", icon="🗣️")
 
-with col_row2_3:
+    with st.expander("⚡ Quick Jump to Method", expanded=False):
+        selected_nlp_quick = st.selectbox(
+            "Select method to explore directly:",
+            options=list(NLP_METHODS.keys()),
+            format_func=lambda k: f"{NLP_METHODS[k]['icon']} {NLP_METHODS[k]['name']}",
+            key="home_quick_nlp_select"
+        )
+        if st.button("Explore This Method 👉", key="btn_quick_nlp_explore"):
+            st.session_state["nlp_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.session_state["nlp_direct_method_key"] = selected_nlp_quick
+            st.session_state["active_nlp_method"] = selected_nlp_quick
+            st.switch_page("pages/6_🗣️_Natural_Language_Processing.py")
+
+st.markdown("---")
+
+col_row3_1, col_row3_2, col_row3_3 = st.columns(3)
+
+with col_row3_1:
     st.markdown("""
     ### ⏱️ Time Series & Forecasting
     **Status:** 🟢 **Active (8 Models & 7 Metrics)**
@@ -226,6 +276,151 @@ with col_row2_3:
     - **Temporal Validation:** Rolling-Origin (Expanding-Window) CV preventing lookahead leakage
     """)
     st.page_link("pages/7_⏱️_Time_Series_and_Forecasting.py", label="Open Time Series & Forecasting ⏱️", icon="⏱️")
+
+    with st.expander("⚡ Quick Jump to Method", expanded=False):
+        selected_ts_quick = st.selectbox(
+            "Select method to explore directly:",
+            options=list(TIME_SERIES_ALGORITHMS.keys()),
+            format_func=lambda k: f"⏱️ {TIME_SERIES_ALGORITHMS[k]['name']}",
+            key="home_quick_ts_select"
+        )
+        if st.button("Explore This Method 👉", key="btn_quick_ts_explore"):
+            st.session_state["ts_direct_method_key"] = selected_ts_quick
+            st.switch_page("pages/7_⏱️_Time_Series_and_Forecasting.py")
+
+with col_row3_2:
+    st.markdown("""
+    ### 🔍 Causal Inference & Policy Evaluation
+    **Status:** 🟢 **Active (5 Architectures)**
+    
+    Quasi-experimental evaluation & counterfactual identification:
+    - **Parallel Trends:** Difference-in-Differences (DiD) & event studies
+    - **Temporal Policy Shocks:** Interrupted Time Series (ITS) segmented regression
+    - **Confounding by Indication:** Propensity Score Matching & IPTW
+    - **Cutoff Decisions:** Sharp & Fuzzy Regression Discontinuity Design (RDD)
+    - **Unmeasured Confounding:** 2SLS Instrumental Variables & Mendelian Randomization
+    """)
+    st.page_link("pages/8_🔍_Causal_Inference_and_Policy_Evaluation.py", label="Open Causal Inference & Policy 🔍", icon="🔍")
+
+    with st.expander("⚡ Quick Jump to Method", expanded=False):
+        selected_causal_quick = st.selectbox(
+            "Select method to explore directly:",
+            options=list(CAUSAL_METHODS.keys()),
+            format_func=lambda k: f"{CAUSAL_METHODS[k]['icon']} {CAUSAL_METHODS[k]['name']}",
+            key="home_quick_causal_select"
+        )
+        if st.button("Explore This Method 👉", key="btn_quick_causal_explore"):
+            st.session_state["causal_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.session_state["causal_direct_method_key"] = selected_causal_quick
+            st.switch_page("pages/8_🔍_Causal_Inference_and_Policy_Evaluation.py")
+
+with col_row3_3:
+    st.markdown("""
+    ### 📈 Statistical Process Control & QI
+    **Status:** 🟢 **Active (5 Architectures)**
+    
+    Healthcare quality improvement & Shewhart control limits:
+    - **Run Charts:** Baseline median, shift, trend, runs & astronomical points
+    - **Shewhart XmR / I-MR:** Individual measures & moving ranges with 3σ limits
+    - **Laney p'-Charts:** Binomial proportions with overdispersion correction
+    - **Laney u'-Charts:** Poisson infection rates per 1,000 bed-days
+    - **NHS Making Data Count:** System variation & assurance icons ($C_p, C_{pk}$)
+    """)
+    st.page_link("pages/9_📈_Statistical_Process_Control_and_Quality_Improvement.py", label="Open Statistical Process Control 📈", icon="📈")
+
+    with st.expander("⚡ Quick Jump to Method", expanded=False):
+        selected_spc_quick = st.selectbox(
+            "Select method to explore directly:",
+            options=list(SPC_METHODS.keys()),
+            format_func=lambda k: f"{SPC_METHODS[k]['icon']} {SPC_METHODS[k]['name']}",
+            key="home_quick_spc_select"
+        )
+        if st.button("Explore This Method 👉", key="btn_quick_spc_explore"):
+            st.session_state["spc_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.session_state["spc_direct_method_key"] = selected_spc_quick
+            st.switch_page("pages/9_📈_Statistical_Process_Control_and_Quality_Improvement.py")
+
+st.markdown("---")
+
+col_row4_1, col_row4_2, col_row4_3 = st.columns(3)
+
+with col_row4_1:
+    st.markdown("""
+    ### 💷 Health Economics & HTA (NICE)
+    **Status:** 🟢 **Active (5 Architectures)**
+    
+    Cost-effectiveness, QALYs & healthcare payer decision models:
+    - **Cost-Effectiveness Plane:** ICER (£/QALY), 4 quadrants & £20k-£30k NICE threshold
+    - **Linear Net Benefits:** Net Monetary Benefit (NMB) & Net Health Benefit (NHB)
+    - **Markov Cohort Models:** 10-year state transitions, half-cycle correction & 3.5% discounting
+    - **Decision Uncertainty:** Monte Carlo PSA, parameter distributions & CEAC curves
+    - **Financial Affordability:** 5-year NHS Budget Impact Analysis (BIA) & hospital offsets
+    """)
+    st.page_link("pages/10_💷_Health_Economics_and_HTA.py", label="Open Health Economics & HTA 💷", icon="💷")
+
+    with st.expander("⚡ Quick Jump to Method", expanded=False):
+        selected_hta_quick = st.selectbox(
+            "Select method to explore directly:",
+            options=list(HTA_METHODS.keys()),
+            format_func=lambda k: f"{HTA_METHODS[k]['icon']} {HTA_METHODS[k]['name']}",
+            key="home_quick_hta_select"
+        )
+        if st.button("Explore This Method 👉", key="btn_quick_hta_explore"):
+            st.session_state["hta_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.session_state["hta_direct_method_key"] = selected_hta_quick
+            st.switch_page("pages/10_💷_Health_Economics_and_HTA.py")
+
+with col_row4_2:
+    st.markdown(r"""
+    ### 🧩 Missing Data & Imputation
+    **Status:** 🟢 **Active (5 Architectures)**
+    
+    Rubin's taxonomy, MICE pooling & regulatory stress-tests:
+    - **Rubin's Taxonomy:** Diagnostic audits, Little's MCAR test & logistic missingness
+    - **Methodological Hazards:** Complete case attrition & mean imputation variance collapse
+    - **MICE Imputation:** Fully conditional specification & Rubin's Rules pooling ($T = \bar{U} + (1+1/m)B$)
+    - **Algorithmic Imputation:** Non-parametric $k$-NN & MissForest random forest ensembles
+    - **MNAR Stress-Testing:** ICH E9 (R1) pattern-mixture $\delta$-adjustment tipping point analysis
+    """)
+    st.page_link("pages/11_🧩_Missing_Data_and_Imputation.py", label="Open Missing Data & Imputation 🧩", icon="🧩")
+
+    with st.expander("⚡ Quick Jump to Method", expanded=False):
+        selected_missing_quick = st.selectbox(
+            "Select method to explore directly:",
+            options=list(MISSING_DATA_METHODS.keys()),
+            format_func=lambda k: f"{MISSING_DATA_METHODS[k]['icon']} {MISSING_DATA_METHODS[k]['name']}",
+            key="home_quick_missing_select"
+        )
+        if st.button("Explore This Method 👉", key="btn_quick_missing_explore"):
+            st.session_state["missing_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.session_state["missing_direct_method_key"] = selected_missing_quick
+            st.switch_page("pages/11_🧩_Missing_Data_and_Imputation.py")
+
+with col_row4_3:
+    st.markdown(r"""
+    ### 🪜 Longitudinal & Mixed Models
+    **Status:** 🟢 **Active (5 Architectures)**
+    
+    Repeated measures, subject trajectories & organizational nesting:
+    - **LMM Random Slopes:** Laird & Ware formulation, personalized rates of change & ICC
+    - **GLMM Repeated Outcomes:** Mixed logistic/Poisson regressions & non-collapsible ORs
+    - **RM-ANOVA Tradeoff:** Mauchly's sphericity, Greenhouse-Geisser & LMM MAR recovery
+    - **3-Level Hierarchies:** Patients nested in clinicians in trusts & variance partitioning (VPC)
+    - **Covariance Selection:** AR(1) error decay, ML vs REML & Nakagawa $R^2_m$ / $R^2_c$
+    """)
+    st.page_link("pages/12_🪜_Longitudinal_and_Mixed_Models.py", label="Open Longitudinal & Mixed Models 🪜", icon="🪜")
+
+    with st.expander("⚡ Quick Jump to Method", expanded=False):
+        selected_mixed_quick = st.selectbox(
+            "Select method to explore directly:",
+            options=list(MIXED_MODELS_METHODS.keys()),
+            format_func=lambda k: f"{MIXED_MODELS_METHODS[k]['icon']} {MIXED_MODELS_METHODS[k]['name']}",
+            key="home_quick_mixed_select"
+        )
+        if st.button("Explore This Method 👉", key="btn_quick_mixed_explore"):
+            st.session_state["mixed_nav_mode_radio"] = "🔍 Direct Method Explorer"
+            st.session_state["mixed_direct_method_key"] = selected_mixed_quick
+            st.switch_page("pages/12_🪜_Longitudinal_and_Mixed_Models.py")
 
 st.markdown("---")
 

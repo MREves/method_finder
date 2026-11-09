@@ -143,24 +143,3 @@ with col_next:
             st.session_state["fundamentals_active_topic"] = next_key
             st.rerun()
 
-# ----------------- Quick Navigation Hub -----------------
-st.markdown("---")
-st.markdown("#### 🧭 Continue Your Learning Pathway:")
-c_h1, c_h2, c_h3, c_h4, c_h5, c_h6, c_h7, c_h8 = st.columns(8)
-with c_h1:
-    st.page_link("app.py", label="Home Overview Hub", icon="🏠")
-with c_h2:
-    st.page_link("pages/8_🎯_Study_Design_and_Method_Selector.py", label="Method Selector", icon="🎯")
-with c_h3:
-    st.page_link("pages/9_🗺️_Decision_Flowcharts.py", label="Decision Flowcharts", icon="🗺️")
-with c_h4:
-    st.page_link("pages/1_📊_Statistical_Tests.py", label="Statistical Tests", icon="📊")
-with c_h5:
-    st.page_link("pages/2_🏥_Epidemiology_Methods.py", label="Epidemiology Methods", icon="🏥")
-with c_h6:
-    st.page_link("pages/4_📐_Sample_Size_and_Power.py", label="Sample Size & Power", icon="📐")
-with c_h7:
-    st.page_link("pages/5_📋_Survey_and_Questionnaire_Analysis.py", label="Survey Analysis", icon="📋")
-with c_h8:
-    st.page_link("pages/6_🗣️_Natural_Language_Processing.py", label="NLP", icon="🗣️")
-

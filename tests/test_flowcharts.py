@@ -28,9 +28,14 @@ from src.ui_components.flowchart_widgets import (
     render_master_triage_flowchart,
     render_statistics_decision_tree,
     render_epidemiology_decision_tree,
+    render_causal_inference_decision_tree,
     render_machine_learning_decision_tree,
     render_sample_size_decision_tree,
     render_nlp_decision_tree,
+    render_spc_qi_decision_tree,
+    render_hta_decision_tree,
+    render_missing_data_decision_tree,
+    render_mixed_models_decision_tree,
     render_html
 )
 
@@ -89,12 +94,47 @@ class TestFlowchartWidgets(unittest.TestCase):
         except Exception as e:
             self.fail(f"render_sample_size_decision_tree crashed: {e}")
 
+    def test_render_causal_inference_decision_tree(self):
+        """Verifies causal inference decision tree renders without errors."""
+        try:
+            render_causal_inference_decision_tree()
+        except Exception as e:
+            self.fail(f"render_causal_inference_decision_tree crashed: {e}")
+
     def test_render_nlp_decision_tree(self):
         """Verifies qualitative analysis / NLP decision tree renders without errors."""
         try:
             render_nlp_decision_tree()
         except Exception as e:
             self.fail(f"render_nlp_decision_tree crashed: {e}")
+
+    def test_render_spc_qi_decision_tree(self):
+        """Verifies SPC & QI decision tree renders without errors."""
+        try:
+            render_spc_qi_decision_tree()
+        except Exception as e:
+            self.fail(f"render_spc_qi_decision_tree crashed: {e}")
+
+    def test_render_hta_decision_tree(self):
+        """Verifies Health Economics & HTA decision tree renders without errors."""
+        try:
+            render_hta_decision_tree()
+        except Exception as e:
+            self.fail(f"render_hta_decision_tree crashed: {e}")
+
+    def test_render_missing_data_decision_tree(self):
+        """Verifies Missing Data decision tree renders without errors."""
+        try:
+            render_missing_data_decision_tree()
+        except Exception as e:
+            self.fail(f"render_missing_data_decision_tree crashed: {e}")
+
+    def test_render_mixed_models_decision_tree(self):
+        """Verifies Longitudinal & Mixed Models decision tree renders without errors."""
+        try:
+            render_mixed_models_decision_tree()
+        except Exception as e:
+            self.fail(f"render_mixed_models_decision_tree crashed: {e}")
 
     def test_render_html_safety(self):
         """Verifies render_html safely cleans whitespace and empty lines."""
@@ -117,7 +157,7 @@ class TestFlowchartASTCompliance(unittest.TestCase):
     def test_flowchart_files_expander_compliance(self):
         """Verifies every st.expander in flowchart files has expanded=False."""
         files_to_check = [
-            os.path.join(PROJECT_ROOT, "pages", "9_🗺️_Decision_Flowcharts.py"),
+            os.path.join(PROJECT_ROOT, "pages", "14_🗺️_Decision_Flowcharts.py"),
             os.path.join(PROJECT_ROOT, "src", "ui_components", "flowchart_widgets.py")
         ]
 
@@ -162,8 +202,13 @@ class TestFlowchartASTCompliance(unittest.TestCase):
             "pages/5_📋_Survey_and_Questionnaire_Analysis.py",
             "pages/6_🗣️_Natural_Language_Processing.py",
             "pages/7_⏱️_Time_Series_and_Forecasting.py",
-            "pages/8_🎯_Study_Design_and_Method_Selector.py",
-            "pages/9_🗺️_Decision_Flowcharts.py"
+            "pages/8_🔍_Causal_Inference_and_Policy_Evaluation.py",
+            "pages/9_📈_Statistical_Process_Control_and_Quality_Improvement.py",
+            "pages/10_💷_Health_Economics_and_HTA.py",
+            "pages/11_🧩_Missing_Data_and_Imputation.py",
+            "pages/12_🪜_Longitudinal_and_Mixed_Models.py",
+            "pages/13_🎯_Study_Design_and_Method_Selector.py",
+            "pages/14_🗺️_Decision_Flowcharts.py"
         ]
 
         for route in expected_routes:
